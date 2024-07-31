@@ -1,7 +1,7 @@
 import express from "express";
 import { PrismaClient } from "@prisma/client";
+import cors from "cors";
 // import bodyParser from "body-parser";
-// import cors from "cors";
 // import router from "./routes.js";
 
 import { URL } from "url";
@@ -11,6 +11,8 @@ config({ path: new URL("../.env", import.meta.url).pathname });
 const prisma = new PrismaClient();
 const app = express();
 app.use(express.json());
+// TODO: configure CORS for production
+app.use(cors());
 
 // LIST ALL STOCK ITEMS
 app.get("/stock", async (req, res) => {
