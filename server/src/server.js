@@ -1,75 +1,17 @@
 import express from "express";
-import { PrismaClient } from "@prisma/client";
 import cors from "cors";
-// import bodyParser from "body-parser";
-// import router from "./routes.js";
-
 import { URL } from "url";
 import { config } from "dotenv";
-config({ path: new URL("../.env", import.meta.url).pathname });
+import routes from "./routes/index.js";
 
-const prisma = new PrismaClient();
+config({ path: new URL("../.env", import.meta.url).pathname });
 const app = express();
 app.use(express.json());
+
 // TODO: configure CORS for production
 app.use(cors());
 
-// LIST ALL STOCK ITEMS
-app.get("/stock", async (req, res) => {
-
-	let stock = [];
-
-	try {
-		if (Object.keys(req.query).length) {
-      stock = await prisma.stock.findMany({
-        where: {
-          OR: [
-            {
-              imei: {
-                contains: req.query.imei
-              }
-            },
-            {
-              model: {
-                contains: req.query.model,
-                mode: "insensitive"
-              }
-            },
-            {
-              color: {
-                contains: req.query.color,
-                mode: "insensitive"
-              }
-            },
-            {
-              capacity: parseInt(req.query.capacity)
-            }
-          ]
-        }
-      });
-    } else {
-      stock = await prisma.stock.findMany();
-    }
-	} catch (err) {
-		console.log(err);
-	}
-
-  res.status(200).json(stock);
-});
-
-// CREATE NEW STOCK ITEM
-app.post("/stock", async (req, res) => {
-  await prisma.stock.create({
-    data: {
-      imei: req.body.imei,
-      model: req.body.model,
-      color: req.body.color,
-      capacity: req.body.capacity
-    }
-  });
-
-  res.status(201).send("Produto cadastrado com sucesso!");
-});
+routes(app);
 
 // UPDATE STOCK ITEMS
 app.put("/stock/:id", async (req, res) => {

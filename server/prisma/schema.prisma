@@ -13,10 +13,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Stock {
-  id       String   @id @default(auto()) @map("_id") @db.ObjectId
-  imei     String   @unique
-  model    String?
-  color    String?
-  capacity Int?
+model Item {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  imei      String  @unique
+  model     String
+  color     String
+  capacity  Int
+  condition String?
+  qty       Int
+  unitPrice Float
+  tax       Float
+  status    String?
+  isAvailable Boolean @default(true)
+}
+
+model Customer {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  name String
+  phone String
+  email String @unique
+  street String?
+  stNumber String?
+  stComplement String?
+  city String?
+  state String?
+  zipCode String?
+  observations String?
 }
