@@ -2,6 +2,88 @@ import { useEffect, useState } from "react";
 import API from "../../services/api";
 import "./styles.css";
 
+import { Layout, Menu, Table } from "antd";
+
+const { Header, Content, Footer } = Layout;
+
+const navItems = [
+  {
+    key: 1,
+    label: "Estoque"
+  },
+  {
+    key: 2,
+    label: "Pedidos"
+  },
+  {
+    key: 3,
+    label: "Clientes"
+  },
+  {
+    key: 4,
+    label: "Relatórios"
+  }
+];
+
+const columns = [
+  {
+    title: "IMEI",
+    dataIndex: "imei",
+    key: "imei"
+  },
+  {
+    title: "Modelo",
+    dataIndex: "model",
+    showSorterTooltip: {
+      target: "model"
+    },
+    onFilter: (value, record) => record.model.indexOf(value) === 0,
+    sorter: (a, b) => a.model.length - b.model.length,
+    sortDirections: ["ascend"]
+  },
+  {
+    title: "Cor",
+    dataIndex: "color",
+    key: "color"
+  },
+  {
+    title: "Capacidade",
+    dataIndex: "capacity",
+    defaultSortOrder: "ascend",
+    sorter: (a, b) => a.capacity - b.capacity
+  },
+  {
+    title: "Condição",
+    dataIndex: "condition",
+    key: "condition"
+  },
+  {
+    title: "Quantidade",
+    dataIndex: "qty",
+    key: "qty"
+  },
+  {
+    title: "Preço Unitário",
+    dataIndex: "unitPrice",
+    key: "unitPrice"
+  },
+  {
+    title: "Taxa",
+    dataIndex: "tax",
+    key: "tax"
+  },
+  {
+    title: "Status",
+    dataIndex: "status",
+    key: "status"
+  },
+  {
+    title: "Disponível",
+    dataIndex: "isAvailable",
+    key: "isAvailable"
+  }
+];
+
 function Dashboard() {
   const [stock, setStock] = useState([]);
 
@@ -17,29 +99,31 @@ function Dashboard() {
   }, []);
 
   return (
-    <>
-      <table border={"1px"}>
-        <thead>
-          <tr>
-            <th>IMEI</th>
-            <th>Modelo</th>
-            <th>Cor</th>
-            <th>Capacidade</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          {stock.map((stockItem) => (
-            <tr key={stockItem.id}>
-              <td>{stockItem.imei}</td>
-              <td>{stockItem.model}</td>
-              <td>{stockItem.color}</td>
-              <td>{stockItem.capacity}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </>
+    <Layout>
+      <Header style={{ display: "flex", alignItems: "center" }}>
+        <div className="demo-logo" />
+        <Menu
+          theme="dark"
+          mode="horizontal"
+          defaultSelectedKeys={["1"]}
+          items={navItems}
+          style={{ flex: 1, minWidth: 10 }}
+        />
+      </Header>
+      <Content style={{ padding: "36px" }}>
+        <Table
+          dataSource={stock}
+          columns={columns}
+          showSorterTooltip={{
+            target: "sorter-icon"
+          }}
+          size="middle"
+        />
+      </Content>
+      <Footer style={{ textAlign: "center" }}>
+        Ant Design ©{new Date().getFullYear()} Created by Ant UED
+      </Footer>
+    </Layout>
   );
 }
 
