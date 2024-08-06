@@ -18,13 +18,15 @@ model Item {
   imei      String  @unique
   model     String
   color     String
-  capacity  Int
+  capacity  String
   condition String?
   qty       Int
   unitPrice Float
   tax       Float
   status    String?
   isAvailable Boolean @default(true)
+  createdAt DateTime?  @default(now())
+  updatedAt DateTime? @updatedAt()
 }
 
 model Customer {
