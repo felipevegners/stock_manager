@@ -1,37 +1,50 @@
 import { Menu } from "antd";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  DashboardOutlined,
+  FileDoneOutlined,
+  FundOutlined,
+  ProductOutlined,
+  UserOutlined
+} from "@ant-design/icons";
 
 const navigation = [
   {
     label: "Dashboard",
+    icon: <DashboardOutlined />,
     key: "/"
   },
   {
     label: "Estoque",
+    icon: <ProductOutlined />,
     key: "/stock"
   },
   {
     label: "Pedidos",
+    icon: <FileDoneOutlined />,
     key: "/orders"
   },
   {
     label: "Clientes",
-    key: "/customers"
+    icon: <UserOutlined />,
+    key: "/customers",
+    disabled: true
   },
   {
     label: "Relatórios",
+    icon: <FundOutlined />,
     key: "/reports"
   }
 ];
 
 function NavMenu() {
   const navigate = useNavigate();
+  const [key, setKey] = useState("");
 
   const handleMenuClick = ({ key }) => {
-    if (key) {
-      console.log("caiu no if --> ", navigate(key));
-      navigate(key);
-    }
+    setKey(key);
+    navigate(key);
   };
 
   return (
@@ -39,7 +52,10 @@ function NavMenu() {
       theme="dark"
       mode="horizontal"
       items={navigation}
+      defaultSelectedKeys={["/"]}
+      selectedKeys={[key]}
       onClick={handleMenuClick}
+      selectable={true}
     />
   );
 }

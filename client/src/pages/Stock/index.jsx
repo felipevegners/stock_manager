@@ -1,10 +1,7 @@
 import { useEffect, useState } from "react";
 import API from "../../services/api";
-import Menu from "../../components/NavMenu.jsx";
 
-import { Layout, Table } from "antd";
-
-const { Header, Content, Footer } = Layout;
+import { Table } from "antd";
 
 const columns = [
   {
@@ -18,9 +15,9 @@ const columns = [
     showSorterTooltip: {
       target: "model"
     },
-    onFilter: (value, record) => record.model.indexOf(value) === 0,
-    sorter: (a, b) => a.model.length - b.model.length,
-    sortDirections: ["ascend"]
+    onFilter: (value, record) => record.model.indexOf(value) === 0
+    // sorter: (a, b) => a.model.length - b.model.length,
+    // sortDirections: ["ascend"]
   },
   {
     title: "Cor",
@@ -59,6 +56,10 @@ const columns = [
     key: "status"
   },
   {
+    title: "Valor total",
+    key: "totalValue"
+  },
+  {
     title: "Disponível",
     dataIndex: "isAvailable",
     key: "isAvailable"
@@ -80,25 +81,43 @@ function Stock() {
   }, []);
 
   return (
-    <Layout>
-      <Header style={{ display: "flex", alignItems: "center" }}>
-        <div className="demo-logo" />
-        <Menu />
-      </Header>
-      <Content style={{ padding: "36px" }}>
-        <Table
-          dataSource={stock}
-          columns={columns}
-          showSorterTooltip={{
-            target: "sorter-icon"
-          }}
-          size="middle"
-        />
-      </Content>
-      <Footer style={{ textAlign: "center" }}>
-        Ant Design ©{new Date().getFullYear()} Created by Ant UED
-      </Footer>
-    </Layout>
+    <>
+      <h1>Estoque</h1>
+      <hr style={{ marginBottom: 16 }} />
+      <input type="search" name="findItem" id="" />
+      <button type="submit">Buscar produto</button>
+      <p>Buscar por</p>
+      <ul>
+        <li>
+          <input type="checkbox" name="imei" id="" />
+          <label>IMEI</label>
+        </li>
+        <li>
+          <input type="checkbox" name="modelo" id="" />
+          <label>Modelo</label>
+        </li>
+        <li>
+          <input type="checkbox" name="cor" id="" />
+          <label>Cor</label>
+        </li>
+        <li>
+          <input type="checkbox" name="capacidade" id="" />
+          <label>Capacidade</label>
+        </li>
+      </ul>
+      <button type="button">Editar produtos</button>
+      <button type="button">Deletar produto</button>
+      <Table
+        dataSource={stock}
+        columns={columns}
+        showSorterTooltip={{
+          target: "sorter-icon"
+        }}
+        size="middle"
+        pagination={false}
+        bordered
+      />
+    </>
   );
 }
 
