@@ -1,7 +1,26 @@
 import { useEffect, useState } from "react";
+import { Table, Input, Select, Button, Space, Divider } from "antd";
+import AddItemForm from "../../components/AddItemForm";
 import API from "../../services/api";
 
-import { Table } from "antd";
+const { Option } = Select;
+const { Search } = Input;
+
+const checkBoxOptions = (
+  <Select
+    defaultValue="Modelo"
+    style={{ width: 150 }}
+    onSelect={(value) => {
+      console.log(value);
+    }}
+  >
+    <Option value="imei">IMEI</Option>
+    <Option value="model">Modelo</Option>
+    <Option value="color">Cor</Option>
+    <Option value="capacity">Capacidade</Option>
+    <Option value="battery">Bateria</Option>
+  </Select>
+);
 
 const columns = [
   {
@@ -14,8 +33,8 @@ const columns = [
     dataIndex: "model",
     showSorterTooltip: {
       target: "model"
-    },
-    onFilter: (value, record) => record.model.indexOf(value) === 0
+    }
+    // onFilter: (value, record) => record.model.indexOf(value) === 0
     // sorter: (a, b) => a.model.length - b.model.length,
     // sortDirections: ["ascend"]
   },
@@ -27,23 +46,31 @@ const columns = [
   {
     title: "Capacidade",
     dataIndex: "capacity",
-    defaultSortOrder: "ascend",
-    sorter: (a, b) => a.capacity - b.capacity
+    render: (value) => {
+      return <span> {value} GB </span>;
+    }
+    // sorter: (a, b) => a.capacity - b.capacity
   },
   {
-    title: "Condição",
-    dataIndex: "condition",
-    key: "condition"
+    title: "Bateria",
+    dataIndex: "battery",
+    key: "battery",
+    render: (value) => {
+      return <span> {value} % </span>;
+    }
   },
   {
-    title: "Quantidade",
-    dataIndex: "qty",
-    key: "qty"
+    title: "Detalhes",
+    dataIndex: "details",
+    key: "details"
   },
   {
-    title: "Preço Unitário",
+    title: "Custo",
     dataIndex: "unitPrice",
-    key: "unitPrice"
+    key: "unitPrice",
+    render: (value) => {
+      return <span>R$ {new Intl.NumberFormat("pt-BR").format(value)} </span>;
+    }
   },
   {
     title: "Taxa",
@@ -56,13 +83,16 @@ const columns = [
     key: "status"
   },
   {
-    title: "Valor total",
-    key: "totalValue"
-  },
-  {
-    title: "Disponível",
-    dataIndex: "isAvailable",
-    key: "isAvailable"
+    title: "Ações",
+    render: () => {
+      return (
+        <>
+          <span>Editar</span>
+          <span> | </span>
+          <span>Excluir</span>
+        </>
+      );
+    }
   }
 ];
 
@@ -82,31 +112,24 @@ function Stock() {
 
   return (
     <>
-      <h1>Estoque</h1>
-      <hr style={{ marginBottom: 16 }} />
-      <input type="search" name="findItem" id="" />
-      <button type="submit">Buscar produto</button>
-      <p>Buscar por</p>
-      <ul>
-        <li>
-          <input type="checkbox" name="imei" id="" />
-          <label>IMEI</label>
-        </li>
-        <li>
-          <input type="checkbox" name="modelo" id="" />
-          <label>Modelo</label>
-        </li>
-        <li>
-          <input type="checkbox" name="cor" id="" />
-          <label>Cor</label>
-        </li>
-        <li>
-          <input type="checkbox" name="capacidade" id="" />
-          <label>Capacidade</label>
-        </li>
-      </ul>
-      <button type="button">Editar produtos</button>
-      <button type="button">Deletar produto</button>
+      <Space direction="vertical" size={"large"} style={{ width: "100%" }}>
+        <h1>Estoque</h1>
+        <Divider />
+        <Button type="primary" size="large">
+          Adicionar produto
+        </Button>
+        <Divider />
+        <AddItemForm />
+        <h3>Buscar produto por característica:</h3>
+        <Search
+          placeholder="Digite sua busca"
+          size="large"
+          onSearch={getStock}
+          enterButton
+          addonBefore={checkBoxOptions}
+        />
+      </Space>
+      <Divider />
       <Table
         dataSource={stock}
         columns={columns}
@@ -117,6 +140,15 @@ function Stock() {
         pagination={false}
         bordered
       />
+      <Divider />
+      <Space>
+        <Button type="primary" size="large">
+          Editar produto
+        </Button>
+        <Button type="primary" size="large" danger>
+          Deletar produto
+        </Button>
+      </Space>
     </>
   );
 }

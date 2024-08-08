@@ -6,8 +6,8 @@ export const getStock = async (data) => {
     model,
     color,
     capacity,
-    status,
-    condition,
+    battery,
+    details,
     isAvailable,
     createdAt,
     updatedAt
@@ -42,13 +42,13 @@ export const getStock = async (data) => {
           },
           {
             status: {
-              contains: status,
+              contains: battery,
               mode: "insensitive"
             }
           },
           {
             condition: {
-              contains: condition,
+              contains: details,
               mode: "insensitive"
             }
           },
@@ -93,8 +93,8 @@ export const updateStockItem = async (data) => {
     model,
     color,
     capacity,
-    condition,
-    qty,
+    battery,
+    details,
     unitPrice,
     tax,
     status,
@@ -109,8 +109,8 @@ export const updateStockItem = async (data) => {
       model,
       color,
       capacity,
-      condition,
-      qty,
+      battery,
+      details,
       unitPrice,
       tax,
       status,
