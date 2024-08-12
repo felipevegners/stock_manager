@@ -1,32 +1,28 @@
 import { useEffect, useState } from "react";
-import { Table, Input, Select, Button, Space, Divider } from "antd";
+import {
+  Table,
+  Input,
+  Select,
+  Space,
+  Divider,
+  Tooltip,
+  Alert,
+  Button,
+  Card
+} from "antd";
+import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import AddItemForm from "../../components/AddItemForm";
-import API from "../../services/api";
+import { getItems } from "../../controllers/ItemController";
+import { AxiosError } from "axios";
+import Link from "antd/es/typography/Link";
 
 const { Option } = Select;
 const { Search } = Input;
 
-const checkBoxOptions = (
-  <Select
-    defaultValue="Modelo"
-    style={{ width: 150 }}
-    onSelect={(value) => {
-      console.log(value);
-    }}
-  >
-    <Option value="imei">IMEI</Option>
-    <Option value="model">Modelo</Option>
-    <Option value="color">Cor</Option>
-    <Option value="capacity">Capacidade</Option>
-    <Option value="battery">Bateria</Option>
-  </Select>
-);
-
 const columns = [
   {
     title: "IMEI",
-    dataIndex: "imei",
-    key: "imei"
+    dataIndex: "imei"
   },
   {
     title: "Modelo",
@@ -34,14 +30,10 @@ const columns = [
     showSorterTooltip: {
       target: "model"
     }
-    // onFilter: (value, record) => record.model.indexOf(value) === 0
-    // sorter: (a, b) => a.model.length - b.model.length,
-    // sortDirections: ["ascend"]
   },
   {
     title: "Cor",
-    dataIndex: "color",
-    key: "color"
+    dataIndex: "color"
   },
   {
     title: "Capacidade",
@@ -49,47 +41,55 @@ const columns = [
     render: (value) => {
       return <span> {value} GB </span>;
     }
-    // sorter: (a, b) => a.capacity - b.capacity
   },
   {
     title: "Bateria",
     dataIndex: "battery",
-    key: "battery",
     render: (value) => {
       return <span> {value} % </span>;
     }
   },
   {
     title: "Detalhes",
-    dataIndex: "details",
-    key: "details"
+    dataIndex: "details"
   },
   {
     title: "Custo",
     dataIndex: "unitPrice",
-    key: "unitPrice",
     render: (value) => {
       return <span>R$ {new Intl.NumberFormat("pt-BR").format(value)} </span>;
     }
   },
   {
     title: "Taxa",
-    dataIndex: "tax",
-    key: "tax"
+    dataIndex: "tax"
   },
   {
     title: "Status",
-    dataIndex: "status",
-    key: "status"
+    dataIndex: "status"
   },
   {
     title: "Ações",
     render: () => {
       return (
         <>
-          <span>Editar</span>
+          <Tooltip title="Editar produto">
+            <EditOutlined
+              style={{ marginRight: 8 }}
+              onClick={() => {
+                console.log("editar");
+              }}
+            />
+          </Tooltip>
           <span> | </span>
-          <span>Excluir</span>
+          <Tooltip title="Excluir produto">
+            <DeleteOutlined
+              style={{ color: "red", marginLeft: 8 }}
+              onClick={() => {
+                console.log("excluir");
+              }}
+            />
+          </Tooltip>
         </>
       );
     }
@@ -98,41 +98,128 @@ const columns = [
 
 function Stock() {
   const [stock, setStock] = useState([]);
+  const [searchFor, setSearchFor] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchMode, setSearchMode] = useState(false);
+  const [viewAddNewItem, setViewAddNewItem] = useState(false);
 
-  // TODO: refac for better structure
-  async function getStock() {
-    const payload = await API.get("/stock");
+  const handleViewAddNew = () => {
+    setViewAddNewItem(true);
+  };
 
-    setStock(payload.data);
-  }
+  const handleSearch = (value, _e, info) => {
+    const searchParams = { [searchFor]: value };
+
+    if (info?.source === "input" && value !== "") {
+      getItems(searchParams).then((result) => setStock(result));
+      setSearchTerm(value);
+      setSearchMode(true);
+    } else if (info?.source === "input" && value === "") {
+      console.log("digite uma busca válida");
+    } else {
+      setSearchMode(false);
+      getItems().then((result) => setStock(result));
+    }
+  };
+
+  const translateSearchFor = (term) => {
+    if (term === "imei") return "IMEI";
+    if (term === "model") return "Modelo";
+    if (term === "color") return "Cor";
+    if (term === "capacity") return "Capacidade";
+    if (term === "battery") return "Bateria";
+
+    return term;
+  };
+
+  const selectOptions = (
+    <Select
+      style={{ width: 150 }}
+      onSelect={(value) => {
+        setSearchFor(value);
+      }}
+    >
+      <Option placeholder>Buscar por</Option>
+      <Option value="imei">IMEI</Option>
+      <Option value="model">Modelo</Option>
+      <Option value="color">Cor</Option>
+      <Option value="capacity">Capacidade</Option>
+      <Option value="battery">Bateria</Option>
+    </Select>
+  );
 
   useEffect(() => {
-    getStock();
+    getItems().then((result) => {
+      if (result instanceof AxiosError) {
+        console.log("result ---> ", result.message);
+      } else {
+        setStock(result);
+      }
+    });
   }, []);
 
   return (
     <>
-      <Space direction="vertical" size={"large"} style={{ width: "100%" }}>
+      <Space direction="horizontal" size="large" style={{ width: "100%" }}>
         <h1>Estoque</h1>
-        <Divider />
-        <Button type="primary" size="large">
+        <Button
+          type="primary"
+          size="large"
+          onClick={handleViewAddNew}
+          icon={<PlusOutlined />}
+        >
           Adicionar produto
         </Button>
-        <Divider />
-        <AddItemForm />
+      </Space>
+      {viewAddNewItem && (
+        <>
+          <Divider />
+          <Space size="large">
+            <Card>
+              <h2>Adicionar produto</h2>
+              <br />
+              <AddItemForm handleGetStock={getItems} />
+            </Card>
+          </Space>
+        </>
+      )}
+      <Divider />
+      <Space direction="vertical" size={"large"} style={{ width: "100%" }}>
         <h3>Buscar produto por característica:</h3>
         <Search
           placeholder="Digite sua busca"
           size="large"
-          onSearch={getStock}
-          enterButton
-          addonBefore={checkBoxOptions}
+          onSearch={handleSearch}
+          addonBefore={selectOptions}
+          enterButton="Buscar"
+          allowClear
+          onClear={handleSearch}
         />
+        <Alert
+          message="Digite uma busca válida"
+          type="warning"
+          showIcon
+          closable
+        ></Alert>
       </Space>
       <Divider />
+      {searchMode && (
+        <Space style={{ marginBottom: 24 }}>
+          <h2>
+            Mostrando {stock.length} resultado{stock.length > 1 ? "s" : ""} da
+            busca por:{" "}
+            <strong>&quot;{translateSearchFor(searchFor)}&quot;</strong> e{" "}
+            <strong>&quot;{searchTerm}&quot;</strong>
+          </h2>
+          <Divider type="vertical" />
+          <Link onClick={handleSearch}>Limpar resultados</Link>
+        </Space>
+      )}
+      <br />
       <Table
         dataSource={stock}
         columns={columns}
+        rowKey={(record) => record.id}
         showSorterTooltip={{
           target: "sorter-icon"
         }}
@@ -140,15 +227,6 @@ function Stock() {
         pagination={false}
         bordered
       />
-      <Divider />
-      <Space>
-        <Button type="primary" size="large">
-          Editar produto
-        </Button>
-        <Button type="primary" size="large" danger>
-          Deletar produto
-        </Button>
-      </Space>
     </>
   );
 }

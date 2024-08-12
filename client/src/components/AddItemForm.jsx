@@ -2,7 +2,8 @@ import { useRef } from "react";
 import { Button, Form, Input, Select, Space } from "antd";
 import API from "../services/api";
 
-function AddItemForm() {
+// eslint-disable-next-line react/prop-types
+function AddItemForm({ handleGetStock }) {
   const inputImei = useRef();
   const inputModel = useRef();
   const inputColor = useRef();
@@ -26,9 +27,9 @@ function AddItemForm() {
       details: inputDetails.current.input.value,
       isAvailable: true
     };
-
     await API.post("/stock", newItemData)
       .then((res) => {
+        handleGetStock();
         console.log("res ---> ", res.data.message);
       })
       .catch((err) => {
