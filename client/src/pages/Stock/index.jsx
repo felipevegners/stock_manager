@@ -9,9 +9,16 @@ import {
   Alert,
   Button,
   Card,
+  Form,
   message
 } from "antd";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  CheckSquareOutlined,
+  CloseSquareOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined
+} from "@ant-design/icons";
 import AddItemForm from "../../components/AddItemForm";
 import { getItems, deleteItem } from "../../controllers/ItemController";
 import { AxiosError } from "axios";
@@ -26,6 +33,10 @@ function Stock() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchMode, setSearchMode] = useState(false);
   const [viewAddNewItem, setViewAddNewItem] = useState(false);
+  const [idToEdit, setIdToEdit] = useState(null);
+  const [isEditMode, setIsEditMode] = useState(true);
+
+  const [form] = Form.useForm();
 
   const handleViewAddNew = () => {
     setViewAddNewItem(true);
@@ -75,81 +86,296 @@ function Stock() {
   const columns = [
     {
       title: "IMEI",
-      dataIndex: "imei"
+      dataIndex: "imei",
+      render: (text, record) => {
+        if (idToEdit === record.id) {
+          return (
+            <Form.Item
+              name="imei"
+              rules={[
+                {
+                  required: true,
+                  message: "Insira um IMEI válido"
+                }
+              ]}
+              style={{ marginBottom: 0 }}
+            >
+              <Input />
+            </Form.Item>
+          );
+        } else {
+          return <>{text}</>;
+        }
+      }
     },
     {
       title: "Modelo",
       dataIndex: "model",
-      showSorterTooltip: {
-        target: "model"
+      render: (text, record) => {
+        if (idToEdit === record.id) {
+          return (
+            <Form.Item
+              name="model"
+              rules={[
+                {
+                  required: true,
+                  message: "Insira o nome do produto"
+                }
+              ]}
+              style={{ marginBottom: 0 }}
+            >
+              <Input />
+            </Form.Item>
+          );
+        } else {
+          return <>{text}</>;
+        }
       }
     },
     {
       title: "Cor",
-      dataIndex: "color"
+      dataIndex: "color",
+      render: (text, record) => {
+        if (idToEdit === record.id) {
+          return (
+            <Form.Item
+              name="color"
+              rules={[
+                {
+                  required: true,
+                  message: "Insira a cor do produto"
+                }
+              ]}
+              style={{ marginBottom: 0 }}
+            >
+              <Input />
+            </Form.Item>
+          );
+        } else {
+          return <>{text}</>;
+        }
+      }
     },
     {
       title: "Capacidade",
       dataIndex: "capacity",
-      render: (value) => {
-        return <span> {value} GB </span>;
+      render: (text, record) => {
+        if (idToEdit === record.id) {
+          return (
+            <Form.Item
+              name="capacity"
+              rules={[
+                {
+                  required: true,
+                  message: "Insira a capacidade em GB"
+                }
+              ]}
+              style={{ marginBottom: 0 }}
+            >
+              <Input />
+            </Form.Item>
+          );
+        } else {
+          return <>{text} GB</>;
+        }
       }
     },
     {
       title: "Bateria",
       dataIndex: "battery",
-      render: (value) => {
-        return <span> {value} % </span>;
+      render: (text, record) => {
+        if (idToEdit === record.id) {
+          return (
+            <Form.Item
+              name="battery"
+              rules={[
+                {
+                  required: true,
+                  message: "Insira a % da bateria"
+                }
+              ]}
+              style={{ marginBottom: 0 }}
+            >
+              <Input />
+            </Form.Item>
+          );
+        } else {
+          return <>{text}%</>;
+        }
       }
     },
     {
       title: "Detalhes",
-      dataIndex: "details"
+      dataIndex: "details",
+      render: (text, record) => {
+        if (idToEdit === record.id) {
+          return (
+            <Form.Item name="details" style={{ marginBottom: 0 }}>
+              <Input />
+            </Form.Item>
+          );
+        } else {
+          return <>{text}</>;
+        }
+      }
     },
     {
       title: "Custo",
       dataIndex: "unitPrice",
-      render: (value) => {
-        return <span>R$ {new Intl.NumberFormat("pt-BR").format(value)} </span>;
+      render: (text, record) => {
+        if (idToEdit === record.id) {
+          return (
+            <Form.Item
+              name="unitPrice"
+              rules={[
+                {
+                  required: true,
+                  message: "Insira o custo do item"
+                }
+              ]}
+              style={{ marginBottom: 0 }}
+            >
+              <Input />
+            </Form.Item>
+          );
+        } else {
+          return <>R$ {new Intl.NumberFormat("pt-BR").format(text)}</>;
+        }
       }
     },
     {
       title: "Taxa",
-      dataIndex: "tax"
+      dataIndex: "tax",
+      render: (text, record) => {
+        if (idToEdit === record.id) {
+          return (
+            <Form.Item
+              name="tax"
+              rules={[
+                {
+                  required: true,
+                  message: "Insira a taxa praticada"
+                }
+              ]}
+              style={{ marginBottom: 0 }}
+            >
+              <Input />
+            </Form.Item>
+          );
+        } else {
+          return <>{text}</>;
+        }
+      }
     },
     {
       title: "Status",
-      dataIndex: "status"
+      dataIndex: "status",
+      render: (text, record) => {
+        if (idToEdit === record.id) {
+          return (
+            <Form.Item
+              label="Status"
+              name="status"
+              rules={[
+                {
+                  required: true,
+                  message: "Insira o status do item"
+                }
+              ]}
+            >
+              <Select>
+                <Select.Option value="Em trânsito">Em trânsito</Select.Option>
+                <Select.Option value="Em estoque">Em estoque</Select.Option>
+                <Select.Option value="Reparo">
+                  Assistência Técnica
+                </Select.Option>
+              </Select>
+            </Form.Item>
+          );
+        } else {
+          return <>{text}</>;
+        }
+      }
     },
     {
       title: "Ações",
-      render: (value) => {
+      render: (value, record) => {
         return (
           <>
-            <Tooltip title="Editar produto">
-              <EditOutlined
-                style={{ marginRight: 8 }}
-                onClick={() => {
-                  console.log("editar");
-                }}
-              />
-            </Tooltip>
-            <span> | </span>
-            <Tooltip title="Excluir produto">
-              <DeleteOutlined
-                style={{ color: "red", marginLeft: 8 }}
-                onClick={() =>
-                  deleteItem(value.id).then((result) => {
-                    message.success(result.message);
-                  })
-                }
-              />
-            </Tooltip>
+            {isEditMode ? (
+              <Tooltip title="Editar produto">
+                <EditOutlined
+                  style={{ fontSize: 20, marginRight: 8 }}
+                  onClick={() => {
+                    setIsEditMode(false);
+                    setIdToEdit(record.id);
+                    handleSetFormFields(record);
+                  }}
+                />
+              </Tooltip>
+            ) : (
+              <Tooltip title="Salvar edições">
+                <Button
+                  type="link"
+                  htmlType="submit"
+                  icon={
+                    <CheckSquareOutlined
+                      style={{ fontSize: 20, color: "green" }}
+                    />
+                  }
+                />
+              </Tooltip>
+            )}
+            <Divider type="vertical" />
+            {isEditMode ? (
+              <Tooltip title="Excluir produto">
+                <DeleteOutlined
+                  style={{ fontSize: 20, color: "red", marginLeft: 8 }}
+                  onClick={() =>
+                    deleteItem(value.id).then((result) => {
+                      message.success(result.message);
+                    })
+                  }
+                />
+              </Tooltip>
+            ) : (
+              <Tooltip title="Cancelar edição">
+                <CloseSquareOutlined
+                  style={{ fontSize: 20, marginLeft: 8 }}
+                  onClick={() => {
+                    setIdToEdit(null);
+                    setIsEditMode(true);
+                  }}
+                />
+              </Tooltip>
+            )}
           </>
         );
       }
     }
   ];
+
+  const handleEditItem = (values) => {
+    const updatedItem = [...stock];
+    updatedItem.splice(idToEdit, 1, values);
+
+    console.log("updated item --> ", idToEdit, values);
+  };
+
+  const handleSetFormFields = (record) => {
+    form.setFieldsValue({
+      id: record.id,
+      imei: record.imei,
+      model: record.model,
+      color: record.color,
+      capacity: record.capacity,
+      battery: record.battery,
+      details: record.details,
+      unitPrice: record.unitPrice,
+      tax: record.tax,
+      status: record.status
+    });
+  };
 
   useEffect(() => {
     getItems().then((result) => {
@@ -220,17 +446,19 @@ function Stock() {
         </Space>
       )}
       <br />
-      <Table
-        dataSource={stock}
-        columns={columns}
-        rowKey={(record) => record.id}
-        showSorterTooltip={{
-          target: "sorter-icon"
-        }}
-        size="middle"
-        pagination={false}
-        bordered
-      />
+      <Form form={form} onFinish={handleEditItem}>
+        <Table
+          dataSource={stock}
+          columns={columns}
+          rowKey={(record) => record.id}
+          showSorterTooltip={{
+            target: "sorter-icon"
+          }}
+          size="middle"
+          pagination={false}
+          bordered
+        />
+      </Form>
     </>
   );
 }

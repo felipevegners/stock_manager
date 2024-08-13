@@ -23,7 +23,7 @@ const createItem = async (newItemData) => {
 
 const updateItem = async (newItemData) => {
     try {
-        const { data } = await API.put(`item/${newItemData.id}`);
+        const { data } = await API.put(`item/${newItemData.id}`, newItemData);
         return data;
 
     } catch (error) {
