@@ -8,93 +8,17 @@ import {
   Tooltip,
   Alert,
   Button,
-  Card
+  Card,
+  message
 } from "antd";
 import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
 import AddItemForm from "../../components/AddItemForm";
-import { getItems } from "../../controllers/ItemController";
+import { getItems, deleteItem } from "../../controllers/ItemController";
 import { AxiosError } from "axios";
 import Link from "antd/es/typography/Link";
 
 const { Option } = Select;
 const { Search } = Input;
-
-const columns = [
-  {
-    title: "IMEI",
-    dataIndex: "imei"
-  },
-  {
-    title: "Modelo",
-    dataIndex: "model",
-    showSorterTooltip: {
-      target: "model"
-    }
-  },
-  {
-    title: "Cor",
-    dataIndex: "color"
-  },
-  {
-    title: "Capacidade",
-    dataIndex: "capacity",
-    render: (value) => {
-      return <span> {value} GB </span>;
-    }
-  },
-  {
-    title: "Bateria",
-    dataIndex: "battery",
-    render: (value) => {
-      return <span> {value} % </span>;
-    }
-  },
-  {
-    title: "Detalhes",
-    dataIndex: "details"
-  },
-  {
-    title: "Custo",
-    dataIndex: "unitPrice",
-    render: (value) => {
-      return <span>R$ {new Intl.NumberFormat("pt-BR").format(value)} </span>;
-    }
-  },
-  {
-    title: "Taxa",
-    dataIndex: "tax"
-  },
-  {
-    title: "Status",
-    dataIndex: "status"
-  },
-  {
-    title: "Ações",
-    render: () => {
-      return (
-        <>
-          <Tooltip title="Editar produto">
-            <EditOutlined
-              style={{ marginRight: 8 }}
-              onClick={() => {
-                console.log("editar");
-              }}
-            />
-          </Tooltip>
-          <span> | </span>
-          <Tooltip title="Excluir produto">
-            <DeleteOutlined
-              style={{ color: "red", marginLeft: 8 }}
-              onClick={() => {
-                console.log("excluir");
-              }}
-            />
-          </Tooltip>
-        </>
-      );
-    }
-  }
-];
 
 function Stock() {
   const [stock, setStock] = useState([]);
@@ -134,12 +58,12 @@ function Stock() {
 
   const selectOptions = (
     <Select
+      placeholder="Buscar por"
       style={{ width: 150 }}
       onSelect={(value) => {
         setSearchFor(value);
       }}
     >
-      <Option placeholder>Buscar por</Option>
       <Option value="imei">IMEI</Option>
       <Option value="model">Modelo</Option>
       <Option value="color">Cor</Option>
@@ -148,8 +72,88 @@ function Stock() {
     </Select>
   );
 
+  const columns = [
+    {
+      title: "IMEI",
+      dataIndex: "imei"
+    },
+    {
+      title: "Modelo",
+      dataIndex: "model",
+      showSorterTooltip: {
+        target: "model"
+      }
+    },
+    {
+      title: "Cor",
+      dataIndex: "color"
+    },
+    {
+      title: "Capacidade",
+      dataIndex: "capacity",
+      render: (value) => {
+        return <span> {value} GB </span>;
+      }
+    },
+    {
+      title: "Bateria",
+      dataIndex: "battery",
+      render: (value) => {
+        return <span> {value} % </span>;
+      }
+    },
+    {
+      title: "Detalhes",
+      dataIndex: "details"
+    },
+    {
+      title: "Custo",
+      dataIndex: "unitPrice",
+      render: (value) => {
+        return <span>R$ {new Intl.NumberFormat("pt-BR").format(value)} </span>;
+      }
+    },
+    {
+      title: "Taxa",
+      dataIndex: "tax"
+    },
+    {
+      title: "Status",
+      dataIndex: "status"
+    },
+    {
+      title: "Ações",
+      render: (value) => {
+        return (
+          <>
+            <Tooltip title="Editar produto">
+              <EditOutlined
+                style={{ marginRight: 8 }}
+                onClick={() => {
+                  console.log("editar");
+                }}
+              />
+            </Tooltip>
+            <span> | </span>
+            <Tooltip title="Excluir produto">
+              <DeleteOutlined
+                style={{ color: "red", marginLeft: 8 }}
+                onClick={() =>
+                  deleteItem(value.id).then((result) => {
+                    message.success(result.message);
+                  })
+                }
+              />
+            </Tooltip>
+          </>
+        );
+      }
+    }
+  ];
+
   useEffect(() => {
     getItems().then((result) => {
+      // TODO: Refac this error method
       if (result instanceof AxiosError) {
         console.log("result ---> ", result.message);
       } else {
@@ -178,7 +182,7 @@ function Stock() {
             <Card>
               <h2>Adicionar produto</h2>
               <br />
-              <AddItemForm handleGetStock={getItems} />
+              <AddItemForm handleGetStock={handleSearch} />
             </Card>
           </Space>
         </>

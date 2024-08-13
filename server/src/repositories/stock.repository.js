@@ -106,7 +106,7 @@ export const updateStockItem = async (data) => {
 
 export const deleteStockItem = async (data) => {
 
-  const {id} = data
+  const { id } = data;
 
   const deletedItem = await prisma.item.delete({
     where: { id }
