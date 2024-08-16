@@ -1,9 +1,9 @@
 import API from "../services/api"
 
 
-const getItems = async (searchParams) => {
+const getCustomers = async (searchParams) => {
     try {
-        const { data } = await API.get("/stock", {params: searchParams ? searchParams : {}});
+        const { data } = await API.get("/customer", {params: searchParams ? searchParams : {}});
         return data;
         
     } catch (error) {
@@ -41,4 +41,4 @@ const deleteItem = async (itemId) => {
     }
 }
 
-export {getItems, createItem, deleteItem, updateItem}
+export {getCustomers}

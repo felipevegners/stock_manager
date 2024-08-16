@@ -28,8 +28,7 @@ const navigation = [
   {
     label: "Clientes",
     icon: <UserOutlined />,
-    key: "/customers",
-    disabled: true
+    key: "/customers"
   },
   {
     label: "Relatórios",

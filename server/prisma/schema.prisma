@@ -15,7 +15,7 @@ datasource db {
 
 model Item {
   id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  imei      String?  @unique
+  imei      String?
   model     String?
   color     String?
   capacity  String?
@@ -30,15 +30,15 @@ model Item {
 }
 
 model Customer {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  name String
-  phone String
-  email String @unique
-  street String?
-  stNumber String?
-  stComplement String?
-  city String?
-  state String?
-  zipCode String?
-  observations String?
+  id   String  @id @default(auto()) @map("_id") @db.ObjectId
+  name String?
+  phone String?
+  email String? @unique
+  street String
+  stNumber String
+  stComplement String
+  city String
+  state String
+  zipCode String
+  observations String
 }

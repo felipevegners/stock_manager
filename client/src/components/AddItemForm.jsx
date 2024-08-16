@@ -3,7 +3,7 @@ import { Button, Form, Input, Select, message } from "antd";
 import { createItem } from "../controllers/ItemController";
 
 // eslint-disable-next-line react/prop-types
-function AddItemForm({ handleGetStock }) {
+function AddItemForm({ fetchData }) {
   const inputImei = useRef();
   const inputModel = useRef();
   const inputColor = useRef();
@@ -42,12 +42,8 @@ function AddItemForm({ handleGetStock }) {
     addNewItem();
     form.resetFields();
     setTimeout(() => {
-      fetchItems();
-    }, 1200);
-  };
-
-  const fetchItems = () => {
-    handleGetStock();
+      fetchData();
+    }, 1000);
   };
 
   return (
