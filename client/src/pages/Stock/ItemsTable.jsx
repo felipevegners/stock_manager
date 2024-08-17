@@ -225,11 +225,11 @@ const ItemsTable = ({ tableData, fetchData }) => {
               }
               cancelText="Cancelar"
               okText="Sim"
-              okType="danger"
-              onOpenChange={() => console.log("open change")}
+              okType="primary"
               onConfirm={() => removeItem(record.id)}
               okButtonProps={{
-                loading: isLoading
+                loading: isLoading,
+                danger: true
               }}
             >
               <a>Excluir</a>

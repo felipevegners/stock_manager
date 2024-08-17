@@ -1,5 +1,9 @@
 import { Space, Button, Divider, Card, Spin } from "antd";
-import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  CloseOutlined,
+  LoadingOutlined,
+  PlusOutlined
+} from "@ant-design/icons";
 import AddCustomerForm from "../../components/AddCustomerForm";
 import CustomersTable from "./CustomersTable";
 
@@ -10,6 +14,7 @@ import { AxiosError } from "axios";
 function Customers() {
   const [customers, setCustomers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [showAddNewCustomer, setShowAddNewCustomer] = useState(false);
 
   const fetchData = () => {
     getCustomers().then((result) => {
@@ -35,30 +40,45 @@ function Customers() {
         <Button
           type="primary"
           size="large"
-          onClick={() => {}}
+          onClick={() => setShowAddNewCustomer(true)}
           icon={<PlusOutlined />}
         >
           Novo cliente
         </Button>
       </Space>
+      {showAddNewCustomer && (
+        <>
+          <Divider />
+          <Space
+            size="large"
+            direction="vertical"
+            style={{ display: "flex", transition: "all 0.6s ease-in" }}
+          >
+            <Card
+              title="Cadastrar novo cliente"
+              extra={
+                <CloseOutlined onClick={() => setShowAddNewCustomer(false)} />
+              }
+            >
+              <AddCustomerForm
+                fetchData={fetchData}
+                setShowAddNewCustomer={setShowAddNewCustomer}
+              />
+            </Card>
+          </Space>
+        </>
+      )}
       <Divider />
-      <Space align="start">
-        <Card>
-          {isLoading ? (
-            <Spin
-              spinning={isLoading}
-              indicator={<LoadingOutlined spin />}
-              size="large"
-            />
-          ) : (
-            <CustomersTable tableData={customers} />
-          )}
-        </Card>
-        <Card>
-          <h2>Cadastrar Cliente</h2>
-          <br />
-          <AddCustomerForm />
-        </Card>
+      <Space direction="vertical" size={"large"} style={{ width: "100%" }}>
+        {isLoading ? (
+          <Spin
+            spinning={isLoading}
+            indicator={<LoadingOutlined spin />}
+            size="large"
+          />
+        ) : (
+          <CustomersTable tableData={customers} fetchData={fetchData} />
+        )}
       </Space>
     </>
   );

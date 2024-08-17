@@ -1,115 +1,45 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import {
-  Form,
-  Input,
-  InputNumber,
-  Popconfirm,
-  Table,
-  Typography,
-  message,
-  Divider,
-  Space
-} from "antd";
+import { Popconfirm, Table, Typography, message, Divider } from "antd";
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import { deleteItem, updateItem } from "../../controllers/ItemController";
+import { deleteCustomer } from "../../controllers/CustomerController";
+import EditCustomerModal from "./EditCustomersModal";
 
-const EditableCell = ({
-  children,
-  dataIndex,
-  editing,
-  inputType,
-  title,
-  ...restProps
-}) => {
-  const inputNode = inputType === "number" ? <InputNumber /> : <Input />;
-  return (
-    <td {...restProps}>
-      {editing ? (
-        <Form.Item
-          name={dataIndex}
-          style={{
-            margin: 0
-          }}
-          rules={[
-            {
-              required: true,
-              message: `Insira ${title}`
-            }
-          ]}
-        >
-          {inputNode}
-        </Form.Item>
-      ) : (
-        children
-      )}
-    </td>
-  );
-};
 const CustomersTable = ({ tableData, fetchData }) => {
-  const [form] = Form.useForm();
   const [data, setData] = useState(tableData);
-  const [editingKey, setEditingKey] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const isEditing = (record) => record.id === editingKey;
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editCustomerData, setEditCustomerData] = useState({});
 
   const edit = (record) => {
-    form.setFieldsValue({
-      imei: record.imei,
-      model: record.model,
-      color: record.color,
-      capacity: record.capacity,
-      battery: record.battery,
-      details: record.details,
-      unitPrice: parseFloat(record.unitPrice),
-      tax: parseFloat(record.tax),
-      status: record.status
-    });
-    setEditingKey(record.id);
+    const dataToEdit = {
+      id: record.id,
+      name: record.name,
+      phone: record.phone,
+      email: record.email,
+      street: record.street,
+      stNumber: record.stNumber,
+      stComplement: record.stComplement,
+      city: record.city,
+      state: record.state,
+      zipCode: record.zipCode,
+      observations: record.observations
+    };
+    setEditCustomerData(dataToEdit);
   };
 
-  const cancel = () => {
-    setEditingKey("");
+  const showModal = (record) => {
+    edit(record);
+    setIsModalOpen(true);
   };
 
-  const save = async (key) => {
-    try {
-      const row = await form.validateFields();
-      const newData = [...data];
-      const index = newData.findIndex((item) => key === item.id);
-      if (index > -1) {
-        const item = newData[index];
-        newData.splice(index, 1, {
-          ...item,
-          ...row
-        });
-        setData(newData);
-        setEditingKey("");
-      } else {
-        newData.push(row);
-        setData(newData);
-        setEditingKey("");
-      }
-      updateItem(editingKey, row).then((result) => {
-        if (result?.response?.status === 400) {
-          message.error(
-            "Produto não atualizado. Verifique os dados inseridos."
-          );
-        } else {
-          message.success(result.message);
-          setTimeout(() => {
-            fetchData();
-          }, 1000);
-        }
-      });
-    } catch (errInfo) {
-      console.log("Validate Failed:", errInfo);
-    }
+  const handleCancel = () => {
+    setIsModalOpen(false);
   };
 
-  const removeItem = async (id) => {
+  const removeCustomer = async (id) => {
     setIsLoading(true);
-    deleteItem(id).then((result) => {
+    deleteCustomer(id).then((result) => {
       message.success(result.message);
     });
     setTimeout(() => {
@@ -173,28 +103,9 @@ const CustomersTable = ({ tableData, fetchData }) => {
       dataIndex: "operation",
       with: "5%",
       render: (_, record) => {
-        const editable = isEditing(record);
-        return editable ? (
-          <Space split={<Divider type="vertical" />}>
-            <Typography.Link onClick={() => save(record.id)}>
-              Salvar
-            </Typography.Link>
-            <Divider type="vertical" />
-            <Typography.Link
-              onClick={cancel}
-              style={{
-                marginInlineEnd: 8
-              }}
-            >
-              Cancelar
-            </Typography.Link>
-          </Space>
-        ) : (
+        return (
           <>
-            <Typography.Link
-              disabled={editingKey !== ""}
-              onClick={() => edit(record)}
-            >
+            <Typography.Link onClick={() => showModal(record)}>
               Editar
             </Typography.Link>
             <Divider type="vertical" />
@@ -210,11 +121,11 @@ const CustomersTable = ({ tableData, fetchData }) => {
               }
               cancelText="Cancelar"
               okText="Sim"
-              okType="danger"
-              onOpenChange={() => console.log("open change")}
-              onConfirm={() => removeItem(record.id)}
+              okType="primary"
+              onConfirm={() => removeCustomer(record.id)}
               okButtonProps={{
-                loading: isLoading
+                loading: isLoading,
+                danger: true
               }}
             >
               <a>Excluir</a>
@@ -229,45 +140,24 @@ const CustomersTable = ({ tableData, fetchData }) => {
     setData(tableData);
   }, [tableData]);
 
-  const mergedColumns = columns.map((col) => {
-    if (!col.editable) {
-      return col;
-    }
-    return {
-      ...col,
-      onCell: (record) => ({
-        record,
-        inputType:
-          col.dataIndex === "unitPrice"
-            ? "number"
-            : col.dataIndex === "tax"
-            ? "number"
-            : "text",
-        dataIndex: col.dataIndex,
-        title: col.title,
-        editing: isEditing(record)
-      })
-    };
-  });
   return (
-    <Form form={form} component={false}>
+    <>
       <Table
-        components={{
-          body: {
-            cell: EditableCell
-          }
-        }}
         bordered
         dataSource={data}
-        columns={mergedColumns}
-        rowClassName="editable-row"
+        columns={columns}
         pagination={{
-          onChange: cancel,
           position: ["bottomCenter"]
         }}
         rowKey={(record) => record.id}
       />
-    </Form>
+      <EditCustomerModal
+        isModalOpen={isModalOpen}
+        handleCancel={handleCancel}
+        customerDataToEdit={editCustomerData}
+        fetchData={fetchData}
+      />
+    </>
   );
 };
 export default CustomersTable;

@@ -1,11 +1,21 @@
-import { useRef } from "react";
-import { Button, Divider, Form, Input, message } from "antd";
-import { createItem } from "../controllers/ItemController";
+/* eslint-disable no-unused-vars */
+/* eslint-disable react/prop-types */
+import { useEffect, useRef } from "react";
+import { Button, Col, Divider, Form, Input, message, Row } from "antd";
+import {
+  createCustomer,
+  updateCustomer
+} from "../controllers/CustomerController";
+import { MaskedInput } from "antd-mask-input";
 
 const { TextArea } = Input;
 
-// eslint-disable-next-line react/prop-types
-function AddCustomerForm({ fetchData }) {
+function AddCustomerForm({
+  fetchData,
+  setShowAddNewCustomer,
+  customerDataToEdit,
+  handleCancel
+}) {
   const inputName = useRef();
   const inputPhone = useRef();
   const inputEmail = useRef();
@@ -19,179 +29,249 @@ function AddCustomerForm({ fetchData }) {
 
   const [form] = Form.useForm();
 
-  const addNewCustomer = () => {
-    const newItemData = {
+  const handleCustomerData = () => {
+    const newCustomerData = {
       name: inputName.current.input.value,
       phone: inputPhone.current.input.value,
       email: inputEmail.current.input.value,
       street: inputStreet.current.input.value,
-      stNumber: parseFloat(inputStNumber.current.input.value),
+      stNumber: inputStNumber.current.input.value,
       stComplement: inputStComplement.current.input.value,
       city: inputCity.current.input.value,
       state: inputState.current.input.value,
       zipCode: inputZipCode.current.input.value,
-      observations: inputObservations.current.input.value
+      observations: inputObservations.current.resizableTextArea.textArea.value
     };
-    createItem(newItemData).then((result) => {
-      if (result?.response?.status === 400)
-        message.error("Produto não cadastrado. Verifique os dados inseridos.");
-      else {
-        message.success(result.message);
-      }
+
+    if (customerDataToEdit) {
+      const { id } = customerDataToEdit;
+
+      updateCustomer(id, newCustomerData).then((result) => {
+        if (result?.response?.status === 400) {
+          message.error(
+            "Cadastro não atualizado. Verifique os dados inseridos."
+          );
+        } else {
+          message.success(result.message);
+          handleCancel();
+          form.resetFields();
+        }
+      });
+    } else {
+      createCustomer(newCustomerData).then((result) => {
+        if (result?.response?.status === 400) {
+          console.log(result);
+          message.error(
+            "Cliente não cadastrado. Verifique os dados inseridos."
+          );
+        } else {
+          message.success(result.message);
+          form.resetFields();
+          setShowAddNewCustomer(false);
+        }
+      });
+    }
+  };
+
+  const updateFormValues = () => {
+    form.setFieldsValue({
+      ...customerDataToEdit
     });
   };
 
   const onFinish = () => {
-    addNewCustomer();
-    form.resetFields();
+    handleCustomerData();
     setTimeout(() => {
       fetchData();
     }, 1000);
   };
 
-  return (
-    <Form
-      form={form}
-      labelCol={{ span: 16 }}
-      wrapperCol={{ span: 26 }}
-      layout="vertical"
-      onFinish={onFinish}
-      style={{
-        width: 400
-      }}
-    >
-      <Form.Item
-        label="Nome"
-        name="name"
-        rules={[
-          {
-            required: true,
-            message: "Insira um nome"
-          }
-        ]}
-      >
-        <Input ref={inputName} />
-      </Form.Item>
-      <Form.Item
-        label="Telefone"
-        name="phone"
-        rules={[
-          {
-            required: true,
-            message: "Insira um telefone"
-          }
-        ]}
-      >
-        <Input ref={inputPhone} />
-      </Form.Item>
-      <Form.Item
-        label="E-mail"
-        name="email"
-        rules={[
-          {
-            required: true,
-            message: "Insira um email"
-          }
-        ]}
-      >
-        <Input ref={inputEmail} />
-      </Form.Item>
-      <Divider />
-      <h2>Endereço</h2>
-      <br />
-      <Form.Item
-        label="Rua"
-        name="street"
-        rules={[
-          {
-            required: true,
-            message: "Insira o nome da rua"
-          }
-        ]}
-      >
-        <Input ref={inputStreet} />
-      </Form.Item>
-      <Form.Item style={{ marginBottom: 0 }}>
-        <Form.Item
-          label="Número"
-          name="stNumber"
-          rules={[
-            {
-              required: true,
-              message: "Insira o número"
-            }
-          ]}
-          style={{
-            display: "inline-block",
-            width: "calc(50% - 8px)"
-          }}
-        >
-          <Input ref={inputStNumber} type="number" />
-        </Form.Item>
-        <Form.Item
-          label="Complemento"
-          name="stComplement"
-          rules={[
-            {
-              message: "Insira o complemento"
-            }
-          ]}
-          style={{
-            display: "inline-block",
-            width: "calc(50% - 8px)",
-            margin: "0 8px"
-          }}
-        >
-          <Input ref={inputStComplement} />
-        </Form.Item>
-      </Form.Item>
+  useEffect(() => {
+    if (customerDataToEdit) {
+      updateFormValues();
+    }
+  }, [customerDataToEdit]);
 
-      <Form.Item style={{ marginBottom: 0 }}>
-        <Form.Item
-          label="Cidade"
-          name="city"
-          rules={[
-            {
-              message: "Insira a cidade"
-            }
-          ]}
-          style={{
-            display: "inline-block",
-            width: "calc(50% - 8px)"
+  return (
+    <>
+      <Form form={form} layout="vertical" onFinish={onFinish} size="large">
+        <Row
+          gutter={{
+            xs: 8,
+            sm: 16,
+            md: 24,
+            lg: 32
           }}
         >
-          <Input ref={inputCity} />
-        </Form.Item>
-        <Form.Item
-          label="Estado"
-          name="state"
-          style={{
-            display: "inline-block",
-            width: "calc(50% - 8px)",
-            margin: "0 8px"
-          }}
-        >
-          <Input ref={inputState} />
-        </Form.Item>
-      </Form.Item>
-      <Form.Item
-        label="CEP"
-        name="zipCode"
-        rules={[
-          {
-            message: "Insira o CEP"
-          }
-        ]}
-      >
-        <Input ref={inputZipCode} />
-      </Form.Item>
-      <Form.Item label="Observações" name="observations">
-        <TextArea ref={inputZipCode} rows={2} />
-      </Form.Item>
-      <Button type="primary" htmlType="submit">
-        Cadastrar
-      </Button>
-    </Form>
+          <Col span={12}>
+            <h2>Dados pessoais</h2>
+            <Divider />
+            <Form.Item
+              label="Nome"
+              name="name"
+              rules={[
+                {
+                  required: true,
+                  message: "Insira um nome"
+                }
+              ]}
+            >
+              <Input ref={inputName} />
+            </Form.Item>
+            <Form.Item
+              label="Telefone"
+              name="phone"
+              rules={[
+                {
+                  required: true,
+                  message: "Insira um telefone"
+                }
+              ]}
+            >
+              {customerDataToEdit ? (
+                <Input ref={inputPhone} />
+              ) : (
+                <MaskedInput
+                  ref={inputPhone}
+                  mask={"(00) 00000-0000"}
+                  className="ant-input ant-input-lg css-dev-only-do-not-override-d2lrxs ant-input-outlined ant-input-status-success"
+                />
+              )}
+            </Form.Item>
+            <Form.Item
+              label="E-mail"
+              name="email"
+              rules={[
+                {
+                  required: true,
+                  message: "Insira um email"
+                }
+              ]}
+            >
+              <Input ref={inputEmail} />
+            </Form.Item>
+            <Form.Item label="Observações" name="observations">
+              <TextArea ref={inputObservations} rows={2} />
+            </Form.Item>
+          </Col>
+          <Col span={12}>
+            <h2>Endereço</h2>
+            <Divider />
+            <Form.Item
+              label="Rua"
+              name="street"
+              rules={[
+                {
+                  required: true,
+                  message: "Insira o nome da rua"
+                }
+              ]}
+            >
+              <Input ref={inputStreet} />
+            </Form.Item>
+            <Form.Item style={{ marginBottom: 0 }}>
+              <Form.Item
+                label="Número"
+                name="stNumber"
+                rules={[
+                  {
+                    required: true,
+                    message: "Insira o número"
+                  }
+                ]}
+                style={{
+                  display: "inline-block",
+                  width: "calc(50% - 8px)"
+                }}
+              >
+                <Input ref={inputStNumber} />
+              </Form.Item>
+              <Form.Item
+                label="Complemento"
+                name="stComplement"
+                rules={[
+                  {
+                    message: "Insira o complemento"
+                  }
+                ]}
+                style={{
+                  display: "inline-block",
+                  width: "calc(50% - 8px)",
+                  margin: "0 8px"
+                }}
+              >
+                <Input ref={inputStComplement} />
+              </Form.Item>
+            </Form.Item>
+
+            <Form.Item style={{ marginBottom: 0 }}>
+              <Form.Item
+                label="Cidade"
+                name="city"
+                rules={[
+                  {
+                    message: "Insira a cidade"
+                  }
+                ]}
+                style={{
+                  display: "inline-block",
+                  width: "calc(50% - 8px)"
+                }}
+              >
+                <Input ref={inputCity} />
+              </Form.Item>
+              <Form.Item
+                label="Estado"
+                name="state"
+                style={{
+                  display: "inline-block",
+                  width: "calc(50% - 8px)",
+                  margin: "0 8px"
+                }}
+              >
+                <Input ref={inputState} />
+              </Form.Item>
+            </Form.Item>
+            <Form.Item
+              label="CEP"
+              name="zipCode"
+              rules={[
+                {
+                  message: "Insira o CEP"
+                }
+              ]}
+            >
+              {customerDataToEdit ? (
+                <Input ref={inputZipCode} />
+              ) : (
+                <MaskedInput
+                  ref={inputZipCode}
+                  mask={"00000-000"}
+                  className="ant-input ant-input-lg css-dev-only-do-not-override-d2lrxs ant-input-outlined ant-input-status-success"
+                />
+              )}
+            </Form.Item>
+            {customerDataToEdit ? (
+              <Button
+                type="primary"
+                htmlType="submit"
+                style={{ float: "right" }}
+              >
+                Atualizar Cadastro
+              </Button>
+            ) : (
+              <Button
+                type="primary"
+                htmlType="submit"
+                style={{ float: "right" }}
+              >
+                Cadastrar cliente
+              </Button>
+            )}
+          </Col>
+        </Row>
+      </Form>
+    </>
   );
 }
 

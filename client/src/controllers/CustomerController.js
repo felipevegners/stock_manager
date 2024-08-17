@@ -11,9 +11,9 @@ const getCustomers = async (searchParams) => {
     }
 }
 
-const createItem = async (newItemData) => {
+const createCustomer = async (newCustomerData) => {
     try {
-        const { data } = await API.post("/stock", newItemData);
+        const { data } = await API.post("/customer", newCustomerData);
         return data;
 
     } catch (error) {
@@ -21,9 +21,9 @@ const createItem = async (newItemData) => {
     }
 }
 
-const updateItem = async (id, newItemData) => {
+const updateCustomer = async (id, newCustomerData) => {
     try {
-        const { data } = await API.put(`item/${id}`, newItemData);
+        const { data } = await API.put(`customer/${id}`, newCustomerData);
         return data;
 
     } catch (error) {
@@ -31,9 +31,9 @@ const updateItem = async (id, newItemData) => {
     }
 }
 
-const deleteItem = async (itemId) => {
+const deleteCustomer = async (customerId) => {
     try {
-        const { data } = await API.delete(`item/${itemId}`);
+        const { data } = await API.delete(`customer/${customerId}`);
         return data;
 
     } catch (error) {
@@ -41,4 +41,4 @@ const deleteItem = async (itemId) => {
     }
 }
 
-export {getCustomers}
+export {getCustomers, createCustomer, updateCustomer, deleteCustomer}

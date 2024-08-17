@@ -21,14 +21,14 @@ const navigation = [
     key: "/stock"
   },
   {
-    label: "Pedidos",
-    icon: <FileDoneOutlined />,
-    key: "/orders"
-  },
-  {
     label: "Clientes",
     icon: <UserOutlined />,
     key: "/customers"
+  },
+  {
+    label: "Pedidos",
+    icon: <FileDoneOutlined />,
+    key: "/orders"
   },
   {
     label: "Relatórios",

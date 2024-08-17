@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { Input, Select, Space, Divider, Alert, Button, Card, Spin } from "antd";
-import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  CloseOutlined,
+  LoadingOutlined,
+  PlusOutlined
+} from "@ant-design/icons";
 import AddItemForm from "../../components/AddItemForm";
 import { getItems } from "../../controllers/ItemController";
 import { AxiosError } from "axios";
@@ -98,9 +102,10 @@ function Stock() {
         <>
           <Divider />
           <Space size="large">
-            <Card>
-              <h2>Adicionar produto</h2>
-              <br />
+            <Card
+              title="Adicionar produto"
+              extra={<CloseOutlined onClick={() => setViewAddNewItem(false)} />}
+            >
               <AddItemForm fetchData={fetchData} />
             </Card>
           </Space>

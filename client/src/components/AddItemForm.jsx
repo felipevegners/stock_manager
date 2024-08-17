@@ -56,6 +56,7 @@ function AddItemForm({ fetchData }) {
       style={{
         display: "flex",
         flexDirection: "row",
+        alignItems: "center",
         gap: 16
       }}
     >
