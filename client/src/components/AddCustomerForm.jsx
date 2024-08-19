@@ -128,15 +128,11 @@ function AddCustomerForm({
                 }
               ]}
             >
-              {customerDataToEdit ? (
-                <Input ref={inputPhone} />
-              ) : (
-                <MaskedInput
-                  ref={inputPhone}
-                  mask={"(00) 00000-0000"}
-                  className="ant-input ant-input-lg css-dev-only-do-not-override-d2lrxs ant-input-outlined ant-input-status-success"
-                />
-              )}
+              <MaskedInput
+                ref={inputPhone}
+                mask={"(00) 00000-0000"}
+                className="ant-input ant-input-lg css-dev-only-do-not-override-d2lrxs ant-input-outlined ant-input-status-success"
+              />
             </Form.Item>
             <Form.Item
               label="E-mail"
@@ -241,15 +237,11 @@ function AddCustomerForm({
                 }
               ]}
             >
-              {customerDataToEdit ? (
-                <Input ref={inputZipCode} />
-              ) : (
-                <MaskedInput
-                  ref={inputZipCode}
-                  mask={"00000-000"}
-                  className="ant-input ant-input-lg css-dev-only-do-not-override-d2lrxs ant-input-outlined ant-input-status-success"
-                />
-              )}
+              <MaskedInput
+                ref={inputZipCode}
+                mask={"00000-000"}
+                className="ant-input ant-input-lg css-dev-only-do-not-override-d2lrxs ant-input-outlined ant-input-status-success"
+              />
             </Form.Item>
             {customerDataToEdit ? (
               <Button
