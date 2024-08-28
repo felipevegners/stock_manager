@@ -14,31 +14,44 @@ datasource db {
 }
 
 model Item {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  imei      String?
-  model     String?
-  color     String?
-  capacity  String?
-  battery    String?
-  details   String?
-  unitPrice Float
-  tax       Float
-  status    String?
-  isAvailable Boolean @default(true)
-  createdAt DateTime?  @default(now())
-  updatedAt DateTime? @updatedAt()
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  imei        String?
+  model       String?
+  color       String?
+  capacity    String?
+  battery     String?
+  details     String?
+  unitPrice   Float?
+  tax         Float?
+  profit      Float?
+  status      String?
+  isAvailable Boolean   @default(true)
+  createdAt   DateTime? @default(now())
+  updatedAt   DateTime? @updatedAt()
 }
 
 model Customer {
-  id   String  @id @default(auto()) @map("_id") @db.ObjectId
-  name String?
-  phone String?
-  email String? @unique
-  street String
-  stNumber String
+  id           String  @id @default(auto()) @map("_id") @db.ObjectId
+  name         String?
+  phone        String?
+  email        String? @unique
+  street       String
+  stNumber     String
   stComplement String
-  city String
-  state String
-  zipCode String
+  city         String
+  state        String
+  zipCode      String
   observations String
+}
+
+model Order {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  orderNum   Int
+  orderDate  DateTime
+  customer   Json?
+  items      Json[]
+  shipping   Json
+  orderValue Float
+  payment    String
+  status     String
 }

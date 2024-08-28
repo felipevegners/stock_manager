@@ -80,6 +80,8 @@ export const updateStockItem = async (data) => {
     details,
     unitPrice,
     tax,
+    profit,
+    finalPrice,
     status,
     isAvailable
   } = data.body;
@@ -96,6 +98,8 @@ export const updateStockItem = async (data) => {
       details,
       unitPrice,
       tax,
+      profit,
+      finalPrice,
       status,
       isAvailable
     }

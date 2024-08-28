@@ -6,6 +6,10 @@
   font-weight: 400;
 }
 
+strong {
+  font-weight: 600;
+}
+
 body {
   min-height: 100vh;
   width: 100vw;

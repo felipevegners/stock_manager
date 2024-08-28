@@ -101,7 +101,11 @@ function Stock() {
       {viewAddNewItem && (
         <>
           <Divider />
-          <Space size="large">
+          <Space
+            direction="vertical"
+            size="large"
+            style={{ display: "flex", width: "100%" }}
+          >
             <Card
               title="Adicionar produto"
               extra={<CloseOutlined onClick={() => setViewAddNewItem(false)} />}

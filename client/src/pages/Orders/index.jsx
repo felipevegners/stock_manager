@@ -1,5 +1,5 @@
 import { Space, Button, Divider, Card, Table, Typography } from "antd";
-import { PlusOutlined, CloseOutlined } from "@ant-design/icons";
+import { PlusOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import AddNewOrderForm from "../../components/AddNewOrderForm";
 import { getCustomers } from "../../controllers/CustomerController";
@@ -89,7 +89,9 @@ function Orders() {
 
   return (
     <>
-      <OrderContext.Provider value={{ customersList, itemsAvailable }}>
+      <OrderContext.Provider
+        value={{ customersList, itemsAvailable, setAddNewOrderForm }}
+      >
         <Space direction="horizontal" size="large" style={{ width: "100%" }}>
           <h1>Pedidos</h1>
           <Button
@@ -109,14 +111,7 @@ function Orders() {
               direction="vertical"
               style={{ display: "flex", transition: "all 0.6s ease-in" }}
             >
-              <Card
-                title="Gerar novo pedido de venda ou orçamento"
-                extra={
-                  <CloseOutlined onClick={() => setAddNewOrderForm(false)} />
-                }
-              >
-                <AddNewOrderForm />
-              </Card>
+              <AddNewOrderForm />
             </Space>
           </>
         )}

@@ -8,10 +8,34 @@ import {
   Table,
   Typography,
   message,
-  Divider
+  Divider,
+  Select,
+  Badge
 } from "antd";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { deleteItem, updateItem } from "../../controllers/ItemController";
+
+const statusOptions = [
+  {
+    value: "Em estoque",
+    label: "Em estoque"
+  },
+  {
+    value: "Em trânsito",
+    label: "Em trânsito"
+  },
+  {
+    value: "Reparo",
+    label: "Reparo"
+  }
+];
+
+const selectStatus = (record) => {
+  const filteredStatus = statusOptions.filter(
+    (data) => data.value !== record.status
+  );
+  return filteredStatus;
+};
 
 const EditableCell = ({
   children,
@@ -19,9 +43,17 @@ const EditableCell = ({
   editing,
   inputType,
   title,
+  record,
   ...restProps
 }) => {
-  const inputNode = inputType === "number" ? <InputNumber /> : <Input />;
+  const inputNode =
+    inputType === "number" ? (
+      <InputNumber />
+    ) : inputType === "select" ? (
+      <Select options={selectStatus(record)} />
+    ) : (
+      <Input />
+    );
   return (
     <td {...restProps}>
       {editing ? (
@@ -60,9 +92,11 @@ const ItemsTable = ({ tableData, fetchData }) => {
       capacity: record.capacity,
       battery: record.battery,
       details: record.details,
-      unitPrice: parseFloat(record.unitPrice),
-      tax: parseFloat(record.tax),
-      status: record.status
+      unitPrice: parseFloat(record.unitPrice, 2),
+      tax: parseFloat(record.tax, 2),
+      profit: parseFloat(record.profit, 2),
+      status: record.status,
+      isAvailable: record.isAvailable
     });
     setEditingKey(record.id);
   };
@@ -73,7 +107,11 @@ const ItemsTable = ({ tableData, fetchData }) => {
 
   const save = async (key) => {
     try {
-      const row = await form.validateFields();
+      let row = await form.validateFields();
+      if (row.status === "Reparo" || row.status === "Em trânsito") {
+        row = { ...row, isAvailable: false };
+      } else row = { ...row, isAvailable: true };
+
       const newData = [...data];
       const index = newData.findIndex((item) => key === item.id);
       if (index > -1) {
@@ -89,6 +127,7 @@ const ItemsTable = ({ tableData, fetchData }) => {
         setData(newData);
         setEditingKey("");
       }
+
       updateItem(editingKey, row).then((result) => {
         if (result?.response?.status === 400) {
           message.error(
@@ -128,7 +167,7 @@ const ItemsTable = ({ tableData, fetchData }) => {
       title: "Modelo",
       dataIndex: "model",
       editable: true,
-      with: "10%"
+      with: "8%"
     },
     {
       title: "Cor",
@@ -158,7 +197,7 @@ const ItemsTable = ({ tableData, fetchData }) => {
       title: "Detalhes",
       dataIndex: "details",
       editable: true,
-      width: "15%"
+      width: "10%"
     },
     {
       title: "Custo",
@@ -166,23 +205,83 @@ const ItemsTable = ({ tableData, fetchData }) => {
       editable: true,
       width: "8%",
       render: (text) => {
-        return <>R$ {new Intl.NumberFormat("pt-BR").format(text)}</>;
+        return (
+          <>
+            {new Intl.NumberFormat("pt-BR", {
+              style: "currency",
+              currency: "BRL"
+            }).format(text)}
+          </>
+        );
       }
     },
     {
       title: "Taxa",
       dataIndex: "tax",
       editable: true,
+      with: "4%",
+      render: (text) => {
+        return (
+          <>
+            {new Intl.NumberFormat("pt-BR", {
+              style: "currency",
+              currency: "BRL"
+            }).format(text)}
+          </>
+        );
+      }
+    },
+    {
+      title: "Margem",
+      dataIndex: "profit",
+      editable: true,
       with: "5%",
       render: (text) => {
-        return <>R$ {new Intl.NumberFormat("pt-BR").format(text)}</>;
+        return (
+          <>
+            {new Intl.NumberFormat("pt-BR", {
+              style: "currency",
+              currency: "BRL"
+            }).format(text)}
+          </>
+        );
+      }
+    },
+    {
+      title: "Valor Venda",
+      dataIndex: "finalPrice",
+      editable: false,
+      with: "5%",
+      render: (_, text) => {
+        return (
+          <>
+            {new Intl.NumberFormat("pt-BR", {
+              style: "currency",
+              currency: "BRL"
+            }).format(text.unitPrice + text.profit)}
+          </>
+        );
       }
     },
     {
       title: "Status",
       dataIndex: "status",
       editable: true,
-      width: "10%"
+      width: "8%",
+      render: (text) => {
+        return (
+          <Badge
+            status={
+              text === "Em trânsito"
+                ? "warning"
+                : text === "Reparo"
+                ? "error"
+                : "success"
+            }
+            text={text}
+          />
+        );
+      }
     },
     {
       title: "Ação",
@@ -257,6 +356,12 @@ const ItemsTable = ({ tableData, fetchData }) => {
             ? "number"
             : col.dataIndex === "tax"
             ? "number"
+            : col.dataIndex === "profit"
+            ? "number"
+            : col.dataIndex === "finalPrice"
+            ? "number"
+            : col.dataIndex === "status"
+            ? "select"
             : "text",
         dataIndex: col.dataIndex,
         title: col.title,
