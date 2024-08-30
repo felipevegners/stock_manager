@@ -1,0 +1,89 @@
+{
+    "clientName": "Thunder Client",
+    "collectionName": "Orders",
+    "collectionId": "9eeb7a9a-ba9e-4a5f-bcd4-642301204be5",
+    "dateExported": "2024-08-30T12:04:44.345Z",
+    "version": "1.2",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "cb4c0fa0-f985-47d7-a0fb-f7cc8fc31c20",
+            "colId": "9eeb7a9a-ba9e-4a5f-bcd4-642301204be5",
+            "containerId": "",
+            "name": "GET ORDERS",
+            "url": "http://localhost:3000/orders",
+            "method": "GET",
+            "sortNum": 10000,
+            "created": "2024-08-28T19:05:21.275Z",
+            "modified": "2024-08-29T17:57:46.571Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "id",
+                    "value": "66cf7ce1cbb3b8aa4985a4b6",
+                    "isDisabled": true,
+                    "isPath": false
+                }
+            ]
+        },
+        {
+            "_id": "7e70214d-658f-49d4-92b5-ef0388402403",
+            "colId": "9eeb7a9a-ba9e-4a5f-bcd4-642301204be5",
+            "containerId": "",
+            "name": "CREATE ORDER",
+            "url": "http://localhost:3000/orders",
+            "method": "POST",
+            "sortNum": 20000,
+            "created": "2024-08-28T19:07:08.949Z",
+            "modified": "2024-08-28T19:39:14.021Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"orderNum\": 1,\n  \"customer\": {\n    \"name\": \"Felipe Vegners\",\n    \"phone\": \"(19) 99891-1576\",\n    \"email\": \"felipevegners@gmail.com\",\n    \"street\": \"São Miguel\",\n    \"stNumber\": \"50\",\n    \"stComplement\": \"Perto da esquina 2\",\n    \"city\": \"Praia Grande\",\n    \"state\": \"SP\",\n    \"zipCode\": \"00014-005\",\n    \"observations\": \"Entregar na porta lateral\" \n  },\n  \"items\": [{\n    \"imei\": \"354546546454\",\n    \"model\": \"iPhone 14 Pro Max\",\n    \"color\": \"Prata\",\n    \"capacity\": \"512\",\n    \"battery\": \"99\",\n    \"details\": \"SEM DETALHES\",\n    \"unitPrice\": 2324.5,\n    \"tax\": 5.65,\n    \"profit\": 325.5\n  }],\n  \"shipping\": {\n    \"method\": \"Motoboy\",\n    \"costs\": 150,\n    \"details\": \"\"\n  },\n  \"orderValue\": 4920.7,\n  \"payment\": \"A prazo - 30 dias\",\n  \"status\": \"Em aberto\",\n  \"isDraft\": false\n  \n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "dde4203f-12bb-40f3-b0f4-984c1c61f60a",
+            "colId": "9eeb7a9a-ba9e-4a5f-bcd4-642301204be5",
+            "containerId": "",
+            "name": "UPDATE ORDER",
+            "url": "http://localhost:3000/order/66d0c28daa7fec770650ed39",
+            "method": "PUT",
+            "sortNum": 30000,
+            "created": "2024-08-29T16:20:07.495Z",
+            "modified": "2024-08-29T19:30:26.446Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n\"orderNum\": 3\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "4728456b-ef96-4e94-86fa-6a5fdec1d699",
+            "colId": "9eeb7a9a-ba9e-4a5f-bcd4-642301204be5",
+            "containerId": "",
+            "name": "CANCEL ORDER",
+            "url": "http://localhost:3000/order/66cf7ce1cbb3b8aa4985a4b6",
+            "method": "PATCH",
+            "sortNum": 40000,
+            "created": "2024-08-29T16:22:03.102Z",
+            "modified": "2024-08-29T17:28:47.617Z",
+            "headers": []
+        },
+        {
+            "_id": "478d2fe6-493c-45d3-978d-70f0417a19ab",
+            "colId": "9eeb7a9a-ba9e-4a5f-bcd4-642301204be5",
+            "containerId": "",
+            "name": "DELETE ORDER",
+            "url": "http://localhost:3000/order/66d11801d9eb34079db09721",
+            "method": "DELETE",
+            "sortNum": 50000,
+            "created": "2024-08-30T00:45:59.440Z",
+            "modified": "2024-08-30T01:11:11.154Z",
+            "headers": []
+        }
+    ],
+    "ref": "asH8rJNiLZofXluBZYgRuvW5NP7FbaJ19zQn5h0xD6kG0zlt7CdYh2PCO4YQMLrGw132RalRqMjG9rC2W_qd4Q"
+}

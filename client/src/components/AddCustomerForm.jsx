@@ -137,6 +137,7 @@ function AddCustomerForm({
               ]}
             >
               <MaskedInput
+                ref={inputDocument}
                 mask={
                   document.length < 15 ? "000.000.000-00" : "00.000.000/0001-00"
                 }

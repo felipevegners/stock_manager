@@ -1,4 +1,4 @@
-import { Space, Button, Divider, Card, Spin } from "antd";
+import { Space, Button, Divider, Card, Spin, message } from "antd";
 import {
   CloseOutlined,
   LoadingOutlined,
@@ -9,7 +9,6 @@ import CustomersTable from "../../components/CustomersTable";
 
 import { getCustomers } from "../../controllers/CustomerController";
 import { useEffect, useState } from "react";
-import { AxiosError } from "axios";
 
 function Customers() {
   const [customers, setCustomers] = useState([]);
@@ -18,9 +17,8 @@ function Customers() {
 
   const fetchData = () => {
     getCustomers().then((result) => {
-      // TODO: Refac this error method
-      if (result instanceof AxiosError) {
-        console.log("result ---> ", result.message);
+      if (result?.response?.status === 400) {
+        message.error("Erro ao carregar os dados.");
       } else {
         setCustomers(result);
         setTimeout(() => {

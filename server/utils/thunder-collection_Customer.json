@@ -1,0 +1,69 @@
+{
+    "clientName": "Thunder Client",
+    "collectionName": "Customer",
+    "collectionId": "2e9423b4-d315-4e40-bc7c-6e57ba1098fa",
+    "dateExported": "2024-08-30T12:04:10.426Z",
+    "version": "1.2",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "f8f26ebd-3a23-42a2-8013-deb32c8c2372",
+            "colId": "2e9423b4-d315-4e40-bc7c-6e57ba1098fa",
+            "containerId": "",
+            "name": "Add Customer",
+            "url": "http://localhost:3000/customer",
+            "method": "POST",
+            "sortNum": 10000,
+            "created": "2024-08-16T18:37:01.333Z",
+            "modified": "2024-08-29T14:31:10.090Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"name\": \"John Doe\",\n  \"document\": \"000.111.222-33\",\n  \"phone\": \"(19) 99891-1576\",\n  \"email\": \"john@gmail.com\",\n  \"street\": \"das Couvas\",\n  \"stNumber\": \"234\",\n  \"stComplement\": \"- \",\n  \"city\": \"Jambroba\",\n  \"state\": \"SP\",\n  \"zipCode\": \"13285-987\",\n  \"observations\": \"teste\"\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "3de900c3-bead-4da3-bab2-a27193cb69eb",
+            "colId": "2e9423b4-d315-4e40-bc7c-6e57ba1098fa",
+            "containerId": "",
+            "name": "Get Customers",
+            "url": "http://localhost:3000/customer",
+            "method": "GET",
+            "sortNum": 20000,
+            "created": "2024-08-16T18:45:33.783Z",
+            "modified": "2024-08-16T18:45:55.590Z",
+            "headers": []
+        },
+        {
+            "_id": "62898e22-64ef-4b50-a976-5eb927c1b370",
+            "colId": "2e9423b4-d315-4e40-bc7c-6e57ba1098fa",
+            "containerId": "",
+            "name": "Update Customer",
+            "url": "http://localhost:3000/customer/66d0862e4afd15657d722680",
+            "method": "PUT",
+            "sortNum": 20000,
+            "created": "2024-08-16T18:53:35.946Z",
+            "modified": "2024-08-29T14:32:38.554Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"document\": \"00.111.222/0001-00\"\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "f7f8cf76-8873-44ff-8628-280d43b65063",
+            "colId": "2e9423b4-d315-4e40-bc7c-6e57ba1098fa",
+            "containerId": "",
+            "name": "Delete Customer",
+            "url": "http://localhost:3000/customer/66bffd3902737050d62ee8fb",
+            "method": "DELETE",
+            "sortNum": 30000,
+            "created": "2024-08-16T18:55:13.011Z",
+            "modified": "2024-08-29T14:30:59.733Z",
+            "headers": []
+        }
+    ],
+    "ref": "xzETpTVbJ9k21fiGI5sb73Tnm8HOCvq0Y2fX6YLoh4LQR-TT3qOI0NHH4xXEqWQjAg4PzYzpv40oWmi90nVIRA"
+}

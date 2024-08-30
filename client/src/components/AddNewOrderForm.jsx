@@ -53,6 +53,7 @@ function AddNewOrderForm() {
   const [totalOrderPrice, setTotalOrderPrice] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState({});
   const [orderStatus, setOrderStatus] = useState(null);
+  const [orderObservations, setOrderObservations] = useState("");
 
   const inputCustomerName = useRef();
   const inputPickupBy = useRef();
@@ -282,6 +283,10 @@ function AddNewOrderForm() {
     setTotalOrderPrice(orderTotal);
   };
 
+  const handleOrderObservations = (e) => {
+    setOrderObservations(e.target.value);
+  };
+
   const addNewOrder = () => {
     const newOrderData = {
       orderNum: newOrderNum,
@@ -315,6 +320,7 @@ function AddNewOrderForm() {
     setTimeout(() => {
       form.resetFields();
       setSelectedItems([]);
+      setAddNewOrderForm(false);
       fetchData();
     }, 1000);
   };
@@ -484,7 +490,11 @@ function AddNewOrderForm() {
           <Row>
             <Col span={7}>
               <Form.Item label="Observações" name="observations">
-                <TextArea ref={inputObservations} rows={2} />
+                <TextArea
+                  ref={inputObservations}
+                  rows={2}
+                  onChange={handleOrderObservations}
+                />
               </Form.Item>
             </Col>
           </Row>
@@ -562,6 +572,10 @@ function AddNewOrderForm() {
               <h3>
                 Valor do frete: <strong>{currencyHelper(freigtPrice)}</strong>
               </h3>
+              <h4>
+                <strong>Observações: </strong>
+                {orderObservations}
+              </h4>
             </Col>
             <Col span={8} style={{ backgroundColor: "#bafc9a", padding: 12 }}>
               <h2>

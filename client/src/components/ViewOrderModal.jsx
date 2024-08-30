@@ -127,10 +127,6 @@ function ViewOrderModal() {
                 Total de items:{" "}
                 <strong>{viewOrderModalContent[0].items.length}</strong>
               </h2>
-              {/* <h2>
-            Valor total dos itens:{" "}
-            <strong>{currencyHelper(totalItemsPrice)}</strong>
-          </h2> */}
             </Col>
             <Col span={8}>
               <h3>
@@ -139,6 +135,10 @@ function ViewOrderModal() {
                   {currencyHelper(viewOrderModalContent[0].shipping.costs)}
                 </strong>
               </h3>
+              <h4>
+                <strong>Observações: </strong>
+                {viewOrderModalContent[0].observations}
+              </h4>
             </Col>
             <Col span={8} style={{ backgroundColor: "#ddd", padding: 12 }}>
               <h2>

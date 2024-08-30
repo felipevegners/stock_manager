@@ -1,0 +1,89 @@
+{
+    "clientName": "Thunder Client",
+    "collectionName": "Items",
+    "collectionId": "43340ef1-f397-4077-9fcf-6c4f4465b232",
+    "dateExported": "2024-08-30T12:04:35.275Z",
+    "version": "1.2",
+    "folders": [],
+    "requests": [
+        {
+            "_id": "65f826d6-4096-4495-a0ba-3a51c0c53200",
+            "colId": "43340ef1-f397-4077-9fcf-6c4f4465b232",
+            "containerId": "",
+            "name": "DELETE ITEM",
+            "url": "http://localhost:3000/item/66bacbe59107d246fe747b26",
+            "method": "DELETE",
+            "sortNum": 10000,
+            "created": "2024-08-16T18:36:15.409Z",
+            "modified": "2024-08-16T18:36:15.409Z",
+            "headers": []
+        },
+        {
+            "_id": "98f50aca-1fe2-4bb1-8148-54508f56dbdb",
+            "colId": "43340ef1-f397-4077-9fcf-6c4f4465b232",
+            "containerId": "",
+            "name": "UPDATE ITEM",
+            "url": "http://localhost:3000/item/66ce34847b934a43ed369e7c",
+            "method": "PUT",
+            "sortNum": 20000,
+            "created": "2024-08-16T18:36:29.757Z",
+            "modified": "2024-08-30T01:49:42.344Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"isAvailable\": true,\n  \"status\": \"Em estoque\"\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "e7842f56-dc53-4b56-b097-298d58c31f61",
+            "colId": "43340ef1-f397-4077-9fcf-6c4f4465b232",
+            "containerId": "",
+            "name": "ADD NEW ITEM",
+            "url": "http://localhost:3000/stock",
+            "method": "POST",
+            "sortNum": 30000,
+            "created": "2024-08-16T18:36:37.141Z",
+            "modified": "2024-08-16T18:36:37.141Z",
+            "headers": [],
+            "body": {
+                "type": "json",
+                "raw": "{\n  \"imei\": \"351243320183867\",\n  \"model\": \"13 Pro Max\",\n  \"color\": \"Azul\",\n  \"capacity\": \"128\",\n  \"battery\": \"88\",\n  \"details\": \"TC\",\n  \"unitPrice\": 3435.52,\n  \"tax\": 5.80,\n  \"status\": \"Assistência\"\n}",
+                "form": []
+            }
+        },
+        {
+            "_id": "924bc239-13c8-49f8-a6ab-e2b0cdc483fd",
+            "colId": "43340ef1-f397-4077-9fcf-6c4f4465b232",
+            "containerId": "",
+            "name": "GET STOCK ITEMS",
+            "url": "http://localhost:3000/stock",
+            "method": "GET",
+            "sortNum": 40000,
+            "created": "2024-08-16T18:36:45.136Z",
+            "modified": "2024-08-16T18:36:45.136Z",
+            "headers": [],
+            "params": [
+                {
+                    "name": "color",
+                    "value": "titanium",
+                    "isDisabled": true,
+                    "isPath": false
+                },
+                {
+                    "name": "capacity",
+                    "value": "512",
+                    "isDisabled": true,
+                    "isPath": false
+                },
+                {
+                    "name": "condition",
+                    "value": "Lacrado",
+                    "isDisabled": true,
+                    "isPath": false
+                }
+            ]
+        }
+    ],
+    "ref": "0ivMhcMOwlrYs0eKVooDOoP0-9JH_Ih-cimweCBw4YPEm8r9yyNhzH810Vd_u69oGvaYAVEppa8j8F8Sq1mjKA"
+}

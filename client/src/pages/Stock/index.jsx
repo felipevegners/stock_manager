@@ -1,5 +1,15 @@
 import { useEffect, useState } from "react";
-import { Input, Select, Space, Divider, Alert, Button, Card, Spin } from "antd";
+import {
+  Input,
+  Select,
+  Space,
+  Divider,
+  Alert,
+  Button,
+  Card,
+  Spin,
+  message
+} from "antd";
 import {
   CloseOutlined,
   LoadingOutlined,
@@ -19,6 +29,7 @@ function Stock() {
   const [searchFor, setSearchFor] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchMode, setSearchMode] = useState(false);
+  const [showSearchAlert, setShowSearchAlert] = useState(false);
   const [viewAddNewItem, setViewAddNewItem] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -34,7 +45,7 @@ function Stock() {
       setSearchTerm(value);
       setSearchMode(true);
     } else if (info?.source === "input" && value === "") {
-      console.log("digite uma busca válida");
+      setShowSearchAlert(true);
     } else {
       setSearchMode(false);
       getItems().then((result) => setStock(result));
@@ -69,9 +80,9 @@ function Stock() {
 
   const fetchData = async () => {
     await getItems().then((result) => {
-      // TODO: Refac this error method
       if (result instanceof AxiosError) {
-        console.log("result ---> ", result.message);
+        if (result?.response?.status === 400)
+          message.error("Pedido não encontrado. Tente novamente.");
       } else {
         setStock(result);
         setTimeout(() => {
@@ -126,12 +137,15 @@ function Stock() {
           enterButton="Buscar"
           allowClear
         />
-        <Alert
-          message="Digite uma busca válida"
-          type="warning"
-          showIcon
-          closable
-        ></Alert>
+        {showSearchAlert && (
+          <Alert
+            message="Digite uma busca válida"
+            type="warning"
+            showIcon
+            closable
+            onClose={() => setShowSearchAlert(false)}
+          />
+        )}
       </Space>
       <Divider />
       {searchMode && (

@@ -193,9 +193,6 @@ function AddItemForm({ fetchData }) {
             <InputNumber step="0.01" ref={inputTax} addonBefore="R$" />
           </Form.Item>
           <CurrencyInput
-            onChangeValue={(event, originalValue, maskedValue) => {
-              console.log(event, originalValue, maskedValue);
-            }}
             InputElement={
               <Form.Item
                 label="Margem"
@@ -245,7 +242,7 @@ function AddItemForm({ fetchData }) {
             </Select>
           </Form.Item>
           <Button type="primary" htmlType="submit" size="large">
-            Cadastrar
+            Cadastrar produto
           </Button>
         </Col>
       </Row>

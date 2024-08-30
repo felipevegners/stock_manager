@@ -113,8 +113,8 @@ function Orders() {
   const fetchData = async () => {
     await getCustomers().then((result) => {
       // TODO: Refac this error method
-      if (result.error) {
-        console.log("result ---> ", result.message);
+      if (result?.response?.status === 400) {
+        message.error("Erro ao carregar dados dos clientes. Atualize a página");
       } else {
         setCustomersList(result);
         setTimeout(() => {
@@ -174,7 +174,7 @@ function Orders() {
   };
 
   const turnItemsUnavailable = (orderItems) => {
-    console.log("orderItems -> ", orderItems);
+    // console.log("orderItems -> ", orderItems);
     for (let item in orderItems) {
       updateItem(orderItems[item].id, {
         isAvailable: false,
@@ -192,7 +192,7 @@ function Orders() {
 
   useEffect(() => {
     fetchData();
-    console.log("OrderNum -> ", newOrderNum);
+    // console.log("OrderNum -> ", newOrderNum);
   }, [newOrderNum]);
 
   return (
