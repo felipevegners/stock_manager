@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import { URL } from "url";
 import { config } from "dotenv";
-import routes from "./routes/index.js";
+import routes from "./src/routes/index.js";
 
 config({ path: new URL("../.env", import.meta.url).pathname });
 const app = express();
