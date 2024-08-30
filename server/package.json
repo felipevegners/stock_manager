@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "start": "nodemon -L index.js",
-    "dev": "nodemon -L index.js"
+    "dev": "nodemon -L index.js",
+    "vercel-build": "npx prisma generate"
   },
   "author": "Vegners",
   "license": "ISC",
