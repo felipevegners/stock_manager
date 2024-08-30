@@ -11,11 +11,7 @@ app.use(express.json());
 // TODO: configure CORS for production
 app.use(cors());
 
-app.use("/", (req, res) => {
-  res.send("Server is running!")
-})
-
-// routes(app);
+routes(app);
 
 app.listen(process.env.PORT, () => {
   console.log(`running on: ${process.env.PORT}`);
