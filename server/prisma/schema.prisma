@@ -33,8 +33,9 @@ model Item {
 model Customer {
   id           String  @id @default(auto()) @map("_id") @db.ObjectId
   name         String?
-  phone        String?
-  email        String? @unique
+  document     String?
+  phone        String
+  email        String  @unique
   street       String
   stNumber     String
   stComplement String
@@ -45,13 +46,16 @@ model Customer {
 }
 
 model Order {
-  id         String   @id @default(auto()) @map("_id") @db.ObjectId
-  orderNum   Int
-  orderDate  DateTime
-  customer   Json?
-  items      Json[]
-  shipping   Json
-  orderValue Float
-  payment    String
-  status     String
+  id           String    @id @default(auto()) @map("_id") @db.ObjectId
+  orderNum     String
+  orderDate    DateTime  @default(now())
+  customer     Json?
+  items        Json
+  shipping     Json
+  orderValue   Float
+  payment      Json
+  status       String
+  observations String
+  isDraft      Boolean   @default(false)
+  updatedAt    DateTime? @updatedAt()
 }

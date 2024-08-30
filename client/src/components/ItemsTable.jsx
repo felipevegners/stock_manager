@@ -13,7 +13,7 @@ import {
   Badge
 } from "antd";
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import { deleteItem, updateItem } from "../../controllers/ItemController";
+import { deleteItem, updateItem } from "../controllers/ItemController";
 
 const statusOptions = [
   {
@@ -276,6 +276,10 @@ const ItemsTable = ({ tableData, fetchData }) => {
                 ? "warning"
                 : text === "Reparo"
                 ? "error"
+                : text === "Pendente"
+                ? "processing"
+                : text === "Vendido"
+                ? "default"
                 : "success"
             }
             text={text}
@@ -305,34 +309,66 @@ const ItemsTable = ({ tableData, fetchData }) => {
           </>
         ) : (
           <>
-            <Typography.Link
-              disabled={editingKey !== ""}
-              onClick={() => edit(record)}
-            >
-              Editar
-            </Typography.Link>
-            <Divider type="vertical" />
-            <Popconfirm
-              title="Excluir produto"
-              description="Tem certeza da exclusão?"
-              icon={
-                <QuestionCircleOutlined
-                  style={{
-                    color: "red"
+            {record.status === "Pendente" ? (
+              ""
+            ) : record.status === "Vendido" ? (
+              <>
+                {" "}
+                <Popconfirm
+                  title="Excluir produto"
+                  description="Tem certeza da exclusão?"
+                  icon={
+                    <QuestionCircleOutlined
+                      style={{
+                        color: "red"
+                      }}
+                    />
+                  }
+                  cancelText="Cancelar"
+                  okText="Sim"
+                  okType="primary"
+                  onConfirm={() => removeItem(record.id)}
+                  okButtonProps={{
+                    loading: isLoading,
+                    danger: true
                   }}
-                />
-              }
-              cancelText="Cancelar"
-              okText="Sim"
-              okType="primary"
-              onConfirm={() => removeItem(record.id)}
-              okButtonProps={{
-                loading: isLoading,
-                danger: true
-              }}
-            >
-              <a>Excluir</a>
-            </Popconfirm>
+                >
+                  <a>Excluir</a>
+                </Popconfirm>
+              </>
+            ) : (
+              <>
+                {" "}
+                <Typography.Link
+                  disabled={editingKey !== ""}
+                  onClick={() => edit(record)}
+                >
+                  Editar
+                </Typography.Link>
+                <Divider type="vertical" />
+                <Popconfirm
+                  title="Excluir produto"
+                  description="Tem certeza da exclusão?"
+                  icon={
+                    <QuestionCircleOutlined
+                      style={{
+                        color: "red"
+                      }}
+                    />
+                  }
+                  cancelText="Cancelar"
+                  okText="Sim"
+                  okType="primary"
+                  onConfirm={() => removeItem(record.id)}
+                  okButtonProps={{
+                    loading: isLoading,
+                    danger: true
+                  }}
+                >
+                  <a>Excluir</a>
+                </Popconfirm>
+              </>
+            )}
           </>
         );
       }

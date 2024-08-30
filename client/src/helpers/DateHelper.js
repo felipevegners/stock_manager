@@ -5,3 +5,7 @@ export const getDate = () => {
     const date = today.getDate();
     return `${date}/${month}/${year}`
 }
+
+export const dateFormat = (date) => {
+    return new Date(date).toLocaleDateString("pt-BR")
+}

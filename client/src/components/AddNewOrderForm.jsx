@@ -12,11 +12,11 @@ import {
   Select,
   Table,
   Space,
-  Checkbox,
-  Typography
+  Typography,
+  message
 } from "antd";
 
-const { Title, Text } = Typography;
+const { TextArea } = Input;
 import { OrderContext } from "../pages/Orders/OrderContext";
 
 import { getDate } from "../helpers/DateHelper";
@@ -31,10 +31,16 @@ import {
 const { Option } = Select;
 
 function AddNewOrderForm() {
-  const { customersList, itemsAvailable, setAddNewOrderForm } =
-    useContext(OrderContext);
+  const {
+    customersList,
+    itemsAvailable,
+    setAddNewOrderForm,
+    newOrderNum,
+    createNewOrder,
+    turnItemsUnavailable,
+    fetchData
+  } = useContext(OrderContext);
 
-  const [currentDate, setCurrentDate] = useState(getDate());
   const [isFuturePayment, setIsFuturePayment] = useState(false);
   const [deliveryPickUp, setDeliveryPickUp] = useState(false);
   const [deliveryMethod, setDeliveryMethod] = useState("");
@@ -46,6 +52,13 @@ function AddNewOrderForm() {
   const [totalItemsPrice, setTotalItemsPrice] = useState(null);
   const [totalOrderPrice, setTotalOrderPrice] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState({});
+  const [orderStatus, setOrderStatus] = useState(null);
+
+  const inputCustomerName = useRef();
+  const inputPickupBy = useRef();
+  const inputFreightPrice = useRef();
+  const inputPaymentConditions = useRef();
+  const inputObservations = useRef();
 
   const [form] = Form.useForm();
 
@@ -156,7 +169,8 @@ function AddNewOrderForm() {
       render: (_, record) => {
         return (
           <Typography.Text>
-            {record.imei} - {record.model} - {record.color} - {record.capacity}
+            IMEI {record.imei} - {record.model} - {record.color} -{" "}
+            {record.capacity}
             GB - Bateria {record.battery}%
           </Typography.Text>
         );
@@ -182,11 +196,6 @@ function AddNewOrderForm() {
     }
   ];
 
-  const inputCustomerName = useRef();
-  const inputPickupBy = useRef();
-  const inputFreightPrice = useRef();
-  const inputPaymentConditions = useRef();
-
   const addKey = () => {
     const itemsWithKey = itemsAvailable.map((v, index) => ({
       ...v,
@@ -203,10 +212,6 @@ function AddNewOrderForm() {
   };
   const hasSelected = selectedItems.length > 0;
 
-  const onFinish = () => {
-    console.log(inputCustomerName.current.nativeElement.innerText);
-  };
-
   const handleCustomerData = (customer) => {
     const customerData = customersList.filter((data) => data.name === customer);
     setSelectedCustomer(customerData);
@@ -221,15 +226,17 @@ function AddNewOrderForm() {
 
   const handlePaymentForm = (value) => {
     if (value === "a prazo") {
+      setOrderStatus("Em aberto");
       setIsFuturePayment(true);
-      console.log(value, isFuturePayment);
-      setPaymentMethod({ ...paymentMethod, method: "A prazo" });
+      setPaymentMethod({ ...paymentMethod, method: "À prazo" });
     } else if (value === "a pagar") {
+      setOrderStatus("Em aberto");
       setIsFuturePayment(false);
-      setPaymentMethod({ ...paymentMethod, method: "A pagar" });
-    } else {
+      setPaymentMethod({ ...paymentMethod, method: "À pagar" });
+    } else if (value === "pago") {
+      setOrderStatus("Em aberto");
       setIsFuturePayment(false);
-      setPaymentMethod({ ...paymentMethod, method: "Pago" });
+      setPaymentMethod({ ...paymentMethod, method: "À Vista" });
     }
   };
 
@@ -237,12 +244,14 @@ function AddNewOrderForm() {
     if (value === "pickup") {
       setDeliveryMethod("Retirada");
       setDeliveryPickUp(true);
+      setFreightPrice(0);
     } else if (value === "motoboy") {
       setDeliveryMethod("Entrega Motoboy");
       setDeliveryPickUp(false);
     } else {
       setDeliveryMethod("Entrega - Outro");
       setDeliveryPickUp(false);
+      setFreightPrice(0);
     }
   };
 
@@ -273,11 +282,48 @@ function AddNewOrderForm() {
     setTotalOrderPrice(orderTotal);
   };
 
+  const addNewOrder = () => {
+    const newOrderData = {
+      orderNum: newOrderNum,
+      customer: selectedCustomer,
+      items: [...selectedItems],
+      shipping: {
+        method: deliveryMethod,
+        costs: freigtPrice,
+        details: pickupBy
+      },
+      orderValue: totalOrderPrice,
+      payment: paymentMethod,
+      status: orderStatus,
+      observations: inputObservations.current.resizableTextArea.textArea.value,
+      isDraft: false
+    };
+
+    createNewOrder(newOrderData).then((result) => {
+      if (result?.response?.status === 400) {
+        message.error("Pedido não criado. Verifique os dados inseridos.");
+      } else {
+        message.success(result.message);
+      }
+    });
+
+    turnItemsUnavailable(newOrderData.items);
+  };
+
+  const onFinish = () => {
+    addNewOrder();
+    setTimeout(() => {
+      form.resetFields();
+      setSelectedItems([]);
+      fetchData();
+    }, 1000);
+  };
+
   useEffect(() => {
-    console.log("selected items ", selectedItems);
     calculateOrderPrice();
     addKey();
-  }, [selectedItems]);
+    console.log(orderStatus);
+  }, [selectedItems, freigtPrice, orderStatus]);
 
   return (
     <>
@@ -285,6 +331,7 @@ function AddNewOrderForm() {
         <Card
           title={<h3>Dados do cliente:</h3>}
           extra={<CloseOutlined onClick={() => setAddNewOrderForm(false)} />}
+          style={{ backgroundColor: "#dcdcdc" }}
         >
           <Row
             gutter={{
@@ -341,7 +388,7 @@ function AddNewOrderForm() {
               <h2>Frete e Pagamento</h2>
               <Divider />
             </Col>
-            <Col span={6}>
+            <Col span={4}>
               <Form.Item
                 label="Forma de Pagamento"
                 name="paymentTerm"
@@ -356,9 +403,9 @@ function AddNewOrderForm() {
                   placeholder="Forma de pagamento"
                   onSelect={(value) => handlePaymentForm(value)}
                 >
-                  <Option value="pago">Pago</Option>
-                  <Option value="a pagar">A pagar</Option>
-                  <Option value="a prazo">A prazo</Option>
+                  <Option value="pago">À vista</Option>
+                  <Option value="a pagar">À pagar</Option>
+                  <Option value="a prazo">À prazo</Option>
                 </Select>
               </Form.Item>
             </Col>
@@ -381,7 +428,7 @@ function AddNewOrderForm() {
                 </Form.Item>
               </Col>
             )}
-            <Col span={6}>
+            <Col span={4}>
               <Form.Item
                 label="Entrega"
                 name="delivery"
@@ -434,18 +481,24 @@ function AddNewOrderForm() {
               </Col>
             )}
           </Row>
+          <Row>
+            <Col span={7}>
+              <Form.Item label="Observações" name="observations">
+                <TextArea ref={inputObservations} rows={2} />
+              </Form.Item>
+            </Col>
+          </Row>
         </Card>
         <Divider />
-        <Card>
+        <Card style={{ backgroundColor: "#ddfccf" }}>
           <Row>
             <h2>Resumo do Pedido</h2>
             <Divider />
             <Col span={11}>
               <Space size="small" direction="vertical">
-                <h1>Pedido #0001</h1>
-                <h3>
-                  <strong>Data do pedido:</strong> {currentDate}
-                </h3>
+                <h1>
+                  Pedido <strong>#{newOrderNum}</strong>
+                </h1>
                 <h3>
                   <strong>Cliente</strong>:{" "}
                   {selectedCustomer &&
@@ -490,6 +543,7 @@ function AddNewOrderForm() {
                 columns={finalColumns}
                 dataSource={selectedItems}
                 pagination={false}
+                rowKey={selectedItems.id}
               />
               <Divider />
             </Col>
@@ -509,12 +563,12 @@ function AddNewOrderForm() {
                 Valor do frete: <strong>{currencyHelper(freigtPrice)}</strong>
               </h3>
             </Col>
-            <Col span={8} style={{ backgroundColor: "#ddd", padding: 12 }}>
+            <Col span={8} style={{ backgroundColor: "#bafc9a", padding: 12 }}>
               <h2>
                 Valor total: <strong>{currencyHelper(totalOrderPrice)}</strong>
               </h2>
               <h3>
-                Pagamento:{" "}
+                Forma de Pgto:{" "}
                 <strong>
                   {paymentMethod.method}
                   {paymentMethod.conditions && (

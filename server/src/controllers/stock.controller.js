@@ -43,7 +43,6 @@ export const remove = async (req, res) => {
     res.status(200).json({ message: "Produto removido do Estoque!", item });
     
   } catch (err) {
-    console.log("err --> ", err)
     res.status(400).send(err);
   }
 }

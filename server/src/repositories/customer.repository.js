@@ -16,6 +16,7 @@ export const updateCustomer = async (data) => {
   const { id } = data.params;
   const {
     name,
+    document,
     phone,
     email,
     street,
@@ -33,6 +34,7 @@ export const updateCustomer = async (data) => {
     },
     data: {
       name,
+      document,
       phone,
       email,
       street,

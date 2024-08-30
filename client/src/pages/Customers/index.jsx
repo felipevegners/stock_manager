@@ -5,7 +5,7 @@ import {
   PlusOutlined
 } from "@ant-design/icons";
 import AddCustomerForm from "../../components/AddCustomerForm";
-import CustomersTable from "./CustomersTable";
+import CustomersTable from "../../components/CustomersTable";
 
 import { getCustomers } from "../../controllers/CustomerController";
 import { useEffect, useState } from "react";

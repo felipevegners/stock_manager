@@ -1,6 +1,7 @@
 /* eslint-disable react/prop-types */
-import { Divider, Modal } from "antd";
-import AddCustomerForm from "../../components/AddCustomerForm";
+import { Divider, Modal, Space, Button } from "antd";
+import AddCustomerForm from "./AddCustomerForm";
+import { CloseOutlined } from "@ant-design/icons";
 
 const EditCustomerModal = ({
   handleCancel,
@@ -12,8 +13,18 @@ const EditCustomerModal = ({
     <Modal
       open={isModalOpen}
       onCancel={handleCancel}
-      footer={null}
       width={"85%"}
+      footer={
+        <Space>
+          <Button
+            type="primary"
+            icon={<CloseOutlined />}
+            onClick={handleCancel}
+          >
+            Fechar
+          </Button>
+        </Space>
+      }
     >
       <h2>Atualizar cadastro</h2>
       <Divider />

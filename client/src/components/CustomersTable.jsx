@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Popconfirm, Table, Typography, message, Divider } from "antd";
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import { deleteCustomer } from "../../controllers/CustomerController";
+import { deleteCustomer } from "../controllers/CustomerController";
 import EditCustomerModal from "./EditCustomersModal";
 
 const CustomersTable = ({ tableData, fetchData }) => {
@@ -15,6 +15,7 @@ const CustomersTable = ({ tableData, fetchData }) => {
     const dataToEdit = {
       id: record.id,
       name: record.name,
+      document: record.document,
       phone: record.phone,
       email: record.email,
       street: record.street,
@@ -56,10 +57,30 @@ const CustomersTable = ({ tableData, fetchData }) => {
       width: "10%"
     },
     {
+      title: "Documento",
+      dataIndex: "document",
+      editable: true,
+      width: "10%"
+    },
+    {
       title: "Telefone",
       dataIndex: "phone",
       editable: true,
-      with: "5%"
+      with: "5%",
+      render: (record) => {
+        return (
+          <a
+            href={`https://wa.me/55${record
+              .replace("(", "")
+              .replace(")", "")
+              .replace(" ", "")
+              .replace("-", "")}`}
+            target="_blank"
+          >
+            {record}
+          </a>
+        );
+      }
     },
     {
       title: "E-mail",

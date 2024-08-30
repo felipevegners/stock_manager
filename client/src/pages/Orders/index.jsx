@@ -1,64 +1,109 @@
-import { Space, Button, Divider, Card, Table, Typography } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import {
+  Space,
+  Button,
+  Divider,
+  Card,
+  Table,
+  Typography,
+  Spin,
+  message
+} from "antd";
+import { PlusOutlined, LoadingOutlined } from "@ant-design/icons";
 import { useState, useEffect } from "react";
 import AddNewOrderForm from "../../components/AddNewOrderForm";
 import { getCustomers } from "../../controllers/CustomerController";
+import { getItems, updateItem } from "../../controllers/ItemController";
+import {
+  cancelOrder,
+  createOrder,
+  getOrders,
+  updateOrder
+} from "../../controllers/OrderController";
+import { currencyHelper } from "../../helpers/CurrencyHelper";
+import { dateFormat } from "../../helpers/DateHelper";
 import { OrderContext } from "./OrderContext";
-import { getItems } from "../../controllers/ItemController";
+import ViewOrderModal from "../../components/ViewOrderModal";
 
 function Orders() {
-  // const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [showAddNewOrderForm, setAddNewOrderForm] = useState(false);
   const [customersList, setCustomersList] = useState([]);
   const [itemsAvailable, setItemsAvailable] = useState([]);
-  // const [orders, setOrders] = useState([]);
-
-  const orderData = [
-    {
-      orderNumber: "0001",
-      orderDate: "17-08-2024",
-      orderCustomer: "Vegners",
-      orderItems: "12",
-      orderValue: "R$ 5.869,80",
-      orderStatus: "Em aberto"
-    }
-  ];
+  const [orders, setOrders] = useState([]);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [viewOrderModalContent, setViewOrderModalContent] = useState(null);
+  const [newOrderNum, setNewOrderNum] = useState("");
 
   const columns = [
     {
       title: "Pedido #",
-      dataIndex: "orderNumber"
+      dataIndex: "orderNum"
     },
     {
       title: "Cliente",
-      dataIndex: "orderCustomer"
+      dataIndex: "customer",
+      render: (text) => text[0]?.name
     },
     {
       title: "Items",
-      dataIndex: "orderItems"
+      dataIndex: "items",
+      render: (record) => record.length
     },
     {
       title: "Valor do Pedido",
-      dataIndex: "orderValue"
+      dataIndex: "orderValue",
+      render: (text) => currencyHelper(text)
     },
     {
       title: "Data do Pedido",
-      dataIndex: "orderDate"
+      dataIndex: "orderDate",
+      render: (text) => dateFormat(text)
     },
     {
       title: "Status",
-      dataIndex: "orderStatus"
+      dataIndex: "status",
+      render: (text) => {
+        return (
+          <span
+            style={{
+              color:
+                text === "Cancelado"
+                  ? "red"
+                  : text === "Faturado"
+                  ? "black"
+                  : "green"
+            }}
+          >
+            {text}
+          </span>
+        );
+      }
     },
     {
       title: "Ações",
-      render: () => {
+      render: (record) => {
         return (
           <>
-            <Space split={<Divider type="vertical" />}>
-              <Typography.Link>Ver</Typography.Link>
-              <Typography.Link>Editar</Typography.Link>
-              <Typography.Link>Imprimir</Typography.Link>
-            </Space>
+            {record.status === "Faturado" ? (
+              <Space split={<Divider type="vertical" />}>
+                <Typography.Link
+                  onClick={() => handleViewOrderModal(record.id)}
+                >
+                  Visualizar
+                </Typography.Link>
+              </Space>
+            ) : record.status === "Em aberto" ? (
+              <Space split={<Divider type="vertical" />}>
+                <Typography.Link
+                  onClick={() => handleViewOrderModal(record.id)}
+                >
+                  Visualizar
+                </Typography.Link>
+                <Typography.Link>Editar</Typography.Link>
+              </Space>
+            ) : (
+              <></>
+            )}
           </>
         );
       }
@@ -73,7 +118,7 @@ function Orders() {
       } else {
         setCustomersList(result);
         setTimeout(() => {
-          // setIsLoading(false);
+          setIsLoading(false);
         }, 1000);
       }
     });
@@ -81,23 +126,99 @@ function Orders() {
       const availableItems = result.filter((item) => item.isAvailable);
       setItemsAvailable(availableItems);
     });
+
+    await getOrders().then((result) => {
+      setOrders(result);
+    });
+  };
+
+  const createNewOrder = async (newOrderData) => {
+    await createOrder(newOrderData).then((result) => {
+      if (result?.response?.status === 400)
+        message.error("Pedido não criado. Verifique os dados inseridos.");
+      else {
+        message.success(result.message);
+      }
+    });
+  };
+
+  const upDateOrder = async (updatedOrderData) => {
+    await updateOrder(updatedOrderData).then((result) => {
+      if (result?.response?.status === 400)
+        message.error("Pedido não atualizado. Verifique os dados inseridos.");
+      else {
+        message.success(result.message);
+      }
+    });
+  };
+
+  const cancelAnOrder = async (orderId) => {
+    await cancelOrder(orderId).then((result) => {
+      if (result?.response?.status === 400)
+        message.error("Pedido não cancelado. Verifique os dados inseridos.");
+      else {
+        message.success(result.message);
+      }
+    });
+  };
+
+  const handleViewOrderModal = async (orderId) => {
+    await getOrders({ id: orderId }).then((result) => {
+      if (result?.response?.status === 400)
+        message.error("Pedido não encontrado. Tente novamente.");
+      else {
+        setViewOrderModalContent(result);
+        setIsViewModalOpen(true);
+      }
+    });
+  };
+
+  const turnItemsUnavailable = (orderItems) => {
+    console.log("orderItems -> ", orderItems);
+    for (let item in orderItems) {
+      updateItem(orderItems[item].id, {
+        isAvailable: false,
+        status: "Pendente"
+      });
+    }
+  };
+
+  const generateOrderNum = () => {
+    setAddNewOrderForm(true);
+    let count = orders.length + 1;
+    const orderNum = "0000".substr(String(count).length) + count;
+    setNewOrderNum(orderNum);
   };
 
   useEffect(() => {
     fetchData();
-  }, []);
+    console.log("OrderNum -> ", newOrderNum);
+  }, [newOrderNum]);
 
   return (
     <>
       <OrderContext.Provider
-        value={{ customersList, itemsAvailable, setAddNewOrderForm }}
+        value={{
+          customersList,
+          itemsAvailable,
+          setAddNewOrderForm,
+          createNewOrder,
+          newOrderNum,
+          upDateOrder,
+          cancelAnOrder,
+          isViewModalOpen,
+          setIsViewModalOpen,
+          viewOrderModalContent,
+          turnItemsUnavailable,
+          fetchData
+        }}
       >
         <Space direction="horizontal" size="large" style={{ width: "100%" }}>
-          <h1>Pedidos</h1>
+          <h1>Gerenciar Pedidos</h1>
           <Button
             type="primary"
             size="large"
-            onClick={() => setAddNewOrderForm(true)}
+            onClick={generateOrderNum}
             icon={<PlusOutlined />}
           >
             Novo pedido
@@ -122,13 +243,23 @@ function Orders() {
           style={{ display: "flex", transition: "all 0.6s ease-in" }}
         >
           <Card>
-            <h1>Pedidos </h1>
-            <Table
-              rowKey={(record) => record.orderNumber}
-              dataSource={orderData}
-              columns={columns}
-              bordered
-            />
+            <h1>Todos os Pedidos</h1>
+            <Divider />
+            {isLoading ? (
+              <Spin
+                spinning={isLoading}
+                indicator={<LoadingOutlined spin />}
+                size="large"
+              />
+            ) : (
+              <Table
+                rowKey={(record) => record.id}
+                dataSource={orders}
+                columns={columns}
+                bordered
+              />
+            )}
+            <ViewOrderModal />
           </Card>
         </Space>
       </OrderContext.Provider>

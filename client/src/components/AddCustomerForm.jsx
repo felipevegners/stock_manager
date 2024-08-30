@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Col, Divider, Form, Input, message, Row } from "antd";
 import {
   createCustomer,
@@ -16,7 +16,10 @@ function AddCustomerForm({
   customerDataToEdit,
   handleCancel
 }) {
+  const [document, setDocument] = useState("");
+
   const inputName = useRef();
+  const inputDocument = useRef();
   const inputPhone = useRef();
   const inputEmail = useRef();
   const inputStreet = useRef();
@@ -32,6 +35,7 @@ function AddCustomerForm({
   const handleCustomerData = () => {
     const newCustomerData = {
       name: inputName.current.input.value,
+      document: inputDocument.current.input.value,
       phone: inputPhone.current.input.value,
       email: inputEmail.current.input.value,
       street: inputStreet.current.input.value,
@@ -71,6 +75,10 @@ function AddCustomerForm({
         }
       });
     }
+  };
+
+  const handleDocument = (event) => {
+    setDocument(event.unmaskedValue);
   };
 
   const updateFormValues = () => {
@@ -117,6 +125,26 @@ function AddCustomerForm({
               ]}
             >
               <Input ref={inputName} />
+            </Form.Item>
+            <Form.Item
+              label="CPF ou CNPJ"
+              name="document"
+              rules={[
+                {
+                  required: true,
+                  message: "Insira um documento válido"
+                }
+              ]}
+            >
+              <MaskedInput
+                mask={
+                  document.length < 15 ? "000.000.000-00" : "00.000.000/0001-00"
+                }
+                value={document}
+                onChange={(event) => handleDocument(event)}
+                className="ant-input ant-input-lg css-dev-only-do-not-override-d2lrxs ant-input-outlined ant-input-status-success"
+              />
+              {/* <Input ref={inputDocument} /> */}
             </Form.Item>
             <Form.Item
               label="Telefone"

@@ -9,7 +9,7 @@ import AddItemForm from "../../components/AddItemForm";
 import { getItems } from "../../controllers/ItemController";
 import { AxiosError } from "axios";
 import Link from "antd/es/typography/Link";
-import ItemsTable from "./ItemsTable";
+import ItemsTable from "../../components/ItemsTable";
 
 const { Option } = Select;
 const { Search } = Input;
