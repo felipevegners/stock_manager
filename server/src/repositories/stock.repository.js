@@ -2,6 +2,7 @@ import { prisma } from "../database/index.js";
 
 export const getStock = async (data) => {
   const {
+    batch,
     imei,
     model,
     color,
@@ -18,6 +19,12 @@ export const getStock = async (data) => {
     const stockItems = await prisma.item.findMany({
       where: {
         AND: [
+          {
+            batch: {
+              contains: batch,
+              mode: "insensitive"
+            }
+          },
           {
             imei: {
               contains: imei
@@ -73,6 +80,7 @@ export const addStockItem = async (data) => {
 export const updateStockItem = async (data) => {
   const { id } = data.params;
   const {
+    batch,
     model,
     color,
     capacity,
@@ -91,6 +99,7 @@ export const updateStockItem = async (data) => {
       id
     },
     data: {
+      batch,
       model,
       color,
       capacity,

@@ -200,6 +200,15 @@ const ItemsTable = ({ tableData, fetchData }) => {
       width: "10%"
     },
     {
+      title: "Lote",
+      dataIndex: "batch",
+      editable: true,
+      width: "8%",
+      render: (text) => {
+        return <>{text?.name}</>;
+      }
+    },
+    {
       title: "Custo",
       dataIndex: "unitPrice",
       editable: true,
@@ -215,22 +224,22 @@ const ItemsTable = ({ tableData, fetchData }) => {
         );
       }
     },
-    {
-      title: "Taxa",
-      dataIndex: "tax",
-      editable: true,
-      with: "4%",
-      render: (text) => {
-        return (
-          <>
-            {new Intl.NumberFormat("pt-BR", {
-              style: "currency",
-              currency: "BRL"
-            }).format(text)}
-          </>
-        );
-      }
-    },
+    // {
+    //   title: "Taxa",
+    //   dataIndex: "tax",
+    //   editable: true,
+    //   with: "4%",
+    //   render: (text) => {
+    //     return (
+    //       <>
+    //         {new Intl.NumberFormat("pt-BR", {
+    //           style: "currency",
+    //           currency: "BRL"
+    //         }).format(text)}
+    //       </>
+    //     );
+    //   }
+    // },
     {
       title: "Margem",
       dataIndex: "profit",

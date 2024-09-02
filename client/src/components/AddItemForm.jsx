@@ -1,19 +1,24 @@
 import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Button,
+  Card,
   Col,
+  Divider,
   Form,
   Input,
   InputNumber,
   Row,
   Select,
+  Space,
+  Typography,
   message
 } from "antd";
 import { CurrencyInput } from "react-currency-mask";
 import { createItem } from "../controllers/ItemController";
 
 // eslint-disable-next-line react/prop-types
-function AddItemForm({ fetchData }) {
+function AddItemForm() {
   const inputImei = useRef();
   const inputModel = useRef();
   const inputColor = useRef();
@@ -25,6 +30,10 @@ function AddItemForm({ fetchData }) {
   const inputFinalPrice = useRef();
   const inputStatus = useRef();
   const inputDetails = useRef();
+
+  const navigate = useNavigate();
+
+  // const { fetchData } = useContext(ItemContext);
 
   const [form] = Form.useForm();
 
@@ -69,184 +78,196 @@ function AddItemForm({ fetchData }) {
     addNewItem();
     form.resetFields();
     setTimeout(() => {
-      fetchData();
+      navigate("/stock/list");
     }, 1000);
   };
 
   return (
-    <Form
-      form={form}
-      layout="vertical"
-      labelCol={{ span: 6 }}
-      wrapperCol={{ span: 14 }}
-      onFinish={onFinish}
-    >
-      <Row
-        gutter={{
-          xs: 8,
-          sm: 16,
-          md: 24,
-          lg: 32
-        }}
-      >
-        <Col span={6}>
-          <Form.Item
-            label="IMEI"
-            name="imei"
-            rules={[
-              {
-                required: true,
-                message: "Insira um IMEI válido"
-              }
-            ]}
+    <>
+      <Space direction="vertical" size="large" style={{ width: "100%" }}>
+        <Typography.Link onClick={() => navigate("/stock/list")}>
+          {" "}
+          {"< Voltar"}
+        </Typography.Link>
+        <h1>Adicionar Novo Produto </h1>
+      </Space>
+      <Divider />
+      <Card>
+        <Form
+          form={form}
+          layout="vertical"
+          labelCol={{ span: 6 }}
+          wrapperCol={{ span: 14 }}
+          onFinish={onFinish}
+        >
+          <Row
+            gutter={{
+              xs: 8,
+              sm: 16,
+              md: 24,
+              lg: 32
+            }}
           >
-            <Input ref={inputImei} />
-          </Form.Item>
-          <Form.Item
-            label="Modelo"
-            name="model"
-            rules={[
-              {
-                required: true,
-                message: "Insira o modelo do item"
-              }
-            ]}
-          >
-            <Input ref={inputModel} />
-          </Form.Item>
-          <Form.Item
-            label="Cor"
-            name="color"
-            rules={[
-              {
-                required: true,
-                message: "Insira a cor do item"
-              }
-            ]}
-          >
-            <Input ref={inputColor} />
-          </Form.Item>
-          <Form.Item
-            label="Capacidade"
-            name="capacity"
-            rules={[
-              {
-                required: true,
-                message: "Insira a capacidade em GB"
-              }
-            ]}
-          >
-            <Input ref={inputCapacity} type="number" />
-          </Form.Item>
-          <Form.Item
-            label="Bateria"
-            name="battery"
-            rules={[
-              {
-                required: true,
-                message: "Insira o estado da bateria"
-              }
-            ]}
-          >
-            <Input ref={inputBattery} type="number" />
-          </Form.Item>
-          <Form.Item
-            label="Detalhes"
-            name="details"
-            rules={[
-              {
-                message: "Insira o detalhe do item"
-              }
-            ]}
-          >
-            <Input ref={inputDetails} />
-          </Form.Item>
-        </Col>
-        <Col span={10} offset={2}>
-          <Form.Item
-            label="Custo"
-            name="unitPrice"
-            rules={[
-              {
-                required: true,
-                message: "Insira o custo unitário"
-              }
-            ]}
-          >
-            <InputNumber
-              step="0.01"
-              ref={inputUnitPrice}
-              addonBefore="R$"
-              onChange={calculateFinalPrice}
-            />
-          </Form.Item>
-          <Form.Item
-            label="Taxa"
-            name="tax"
-            rules={[
-              {
-                required: true,
-                message: "Insira a taxa negociada"
-              }
-            ]}
-          >
-            <InputNumber step="0.01" ref={inputTax} addonBefore="R$" />
-          </Form.Item>
-          <CurrencyInput
-            InputElement={
+            <Col span={6}>
               <Form.Item
-                label="Margem"
-                name="profit"
+                label="IMEI"
+                name="imei"
                 rules={[
                   {
                     required: true,
-                    message: "Insira a margem de lucro"
+                    message: "Insira um IMEI válido"
+                  }
+                ]}
+              >
+                <Input ref={inputImei} />
+              </Form.Item>
+              <Form.Item
+                label="Modelo"
+                name="model"
+                rules={[
+                  {
+                    required: true,
+                    message: "Insira o modelo do item"
+                  }
+                ]}
+              >
+                <Input ref={inputModel} />
+              </Form.Item>
+              <Form.Item
+                label="Cor"
+                name="color"
+                rules={[
+                  {
+                    required: true,
+                    message: "Insira a cor do item"
+                  }
+                ]}
+              >
+                <Input ref={inputColor} />
+              </Form.Item>
+              <Form.Item
+                label="Capacidade"
+                name="capacity"
+                rules={[
+                  {
+                    required: true,
+                    message: "Insira a capacidade em GB"
+                  }
+                ]}
+              >
+                <Input ref={inputCapacity} type="number" />
+              </Form.Item>
+              <Form.Item
+                label="Bateria"
+                name="battery"
+                rules={[
+                  {
+                    required: true,
+                    message: "Insira o estado da bateria"
+                  }
+                ]}
+              >
+                <Input ref={inputBattery} type="number" />
+              </Form.Item>
+              <Form.Item
+                label="Detalhes"
+                name="details"
+                rules={[
+                  {
+                    message: "Insira o detalhe do item"
+                  }
+                ]}
+              >
+                <Input ref={inputDetails} />
+              </Form.Item>
+            </Col>
+            <Col span={10} offset={2}>
+              <Form.Item
+                label="Custo"
+                name="unitPrice"
+                rules={[
+                  {
+                    required: true,
+                    message: "Insira o custo unitário"
                   }
                 ]}
               >
                 <InputNumber
                   step="0.01"
-                  ref={inputProfit}
+                  ref={inputUnitPrice}
                   addonBefore="R$"
-                  name="profit"
                   onChange={calculateFinalPrice}
                 />
               </Form.Item>
-            }
-          />
+              <Form.Item
+                label="Taxa"
+                name="tax"
+                rules={[
+                  {
+                    required: true,
+                    message: "Insira a taxa negociada"
+                  }
+                ]}
+              >
+                <InputNumber step="0.01" ref={inputTax} addonBefore="R$" />
+              </Form.Item>
+              <CurrencyInput
+                InputElement={
+                  <Form.Item
+                    label="Margem"
+                    name="profit"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Insira a margem de lucro"
+                      }
+                    ]}
+                  >
+                    <InputNumber
+                      step="0.01"
+                      ref={inputProfit}
+                      addonBefore="R$"
+                      name="profit"
+                      onChange={calculateFinalPrice}
+                    />
+                  </Form.Item>
+                }
+              />
 
-          <Form.Item label="Preço final (projeção)" name="finalPrice">
-            <InputNumber
-              name="finalPrice"
-              ref={inputFinalPrice}
-              addonBefore="R$"
-              step="0.01"
-              style={{ width: "100%" }}
-              readOnly
-            />
-          </Form.Item>
-          <Form.Item
-            label="Status"
-            name="status"
-            rules={[
-              {
-                required: true,
-                message: "Insira o status do item"
-              }
-            ]}
-          >
-            <Select ref={inputStatus}>
-              <Select.Option value="Em trânsito">Em trânsito</Select.Option>
-              <Select.Option value="Em estoque">Em estoque</Select.Option>
-              <Select.Option value="Reparo">Reparo</Select.Option>
-            </Select>
-          </Form.Item>
-          <Button type="primary" htmlType="submit" size="large">
-            Cadastrar produto
-          </Button>
-        </Col>
-      </Row>
-    </Form>
+              <Form.Item label="Preço final (projeção)" name="finalPrice">
+                <InputNumber
+                  name="finalPrice"
+                  ref={inputFinalPrice}
+                  addonBefore="R$"
+                  step="0.01"
+                  style={{ width: "100%" }}
+                  readOnly
+                />
+              </Form.Item>
+              <Form.Item
+                label="Status"
+                name="status"
+                rules={[
+                  {
+                    required: true,
+                    message: "Insira o status do item"
+                  }
+                ]}
+              >
+                <Select ref={inputStatus}>
+                  <Select.Option value="Em trânsito">Em trânsito</Select.Option>
+                  <Select.Option value="Em estoque">Em estoque</Select.Option>
+                  <Select.Option value="Reparo">Reparo</Select.Option>
+                </Select>
+              </Form.Item>
+              <Button type="primary" htmlType="submit" size="large">
+                Cadastrar produto
+              </Button>
+            </Col>
+          </Row>
+        </Form>
+      </Card>
+    </>
   );
 }
 

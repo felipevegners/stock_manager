@@ -13,8 +13,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Batch {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  batchName     String?
+  batchDate     String
+  batchQty      Int
+  batchTax      Float
+  batchFreight  Float
+  batchBoyPrice Float
+  createdAt     DateTime? @default(now())
+  updatedAt     DateTime? @updatedAt()
+}
+
+model category {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  itemName     String
+  itemCapacity String
+  itemColor    String
+}
+
 model Item {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  batch       Json?
   imei        String?
   model       String?
   color       String?

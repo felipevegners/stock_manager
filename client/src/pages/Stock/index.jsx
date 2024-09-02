@@ -6,20 +6,16 @@ import {
   Divider,
   Alert,
   Button,
-  Card,
   Spin,
   message
 } from "antd";
-import {
-  CloseOutlined,
-  LoadingOutlined,
-  PlusOutlined
-} from "@ant-design/icons";
-import AddItemForm from "../../components/AddItemForm";
+import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
+// import AddItemForm from "../../components/AddItemForm";
 import { getItems } from "../../controllers/ItemController";
-import { AxiosError } from "axios";
 import Link from "antd/es/typography/Link";
 import ItemsTable from "../../components/ItemsTable";
+import { ItemContext } from "./ItemContext";
+import { useNavigate } from "react-router-dom";
 
 const { Option } = Select;
 const { Search } = Input;
@@ -30,11 +26,13 @@ function Stock() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchMode, setSearchMode] = useState(false);
   const [showSearchAlert, setShowSearchAlert] = useState(false);
-  const [viewAddNewItem, setViewAddNewItem] = useState(false);
+  // const [viewAddNewItem, setViewAddNewItem] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  const navigate = useNavigate();
+
   const handleViewAddNew = () => {
-    setViewAddNewItem(true);
+    navigate("/stock/add");
   };
 
   const handleSearch = (value, _e, info) => {
@@ -80,9 +78,8 @@ function Stock() {
 
   const fetchData = async () => {
     await getItems().then((result) => {
-      if (result instanceof AxiosError) {
-        if (result?.response?.status === 400)
-          message.error("Pedido não encontrado. Tente novamente.");
+      if (result?.response?.status === 400) {
+        message.error("Produto não encontrado. Tente novamente.");
       } else {
         setStock(result);
         setTimeout(() => {
@@ -97,9 +94,9 @@ function Stock() {
   }, []);
 
   return (
-    <>
+    <ItemContext.Provider value={fetchData}>
       <Space direction="horizontal" size="large" style={{ width: "100%" }}>
-        <h1>Estoque</h1>
+        <h1>Estoque Ativo</h1>
         <Button
           type="primary"
           size="large"
@@ -109,7 +106,7 @@ function Stock() {
           Adicionar produto
         </Button>
       </Space>
-      {viewAddNewItem && (
+      {/* {viewAddNewItem && (
         <>
           <Divider />
           <Space
@@ -121,11 +118,11 @@ function Stock() {
               title="Adicionar produto"
               extra={<CloseOutlined onClick={() => setViewAddNewItem(false)} />}
             >
-              <AddItemForm fetchData={fetchData} />
+              <AddItemForm />
             </Card>
           </Space>
         </>
-      )}
+      )} */}
       <Divider />
       <Space direction="vertical" size={"large"} style={{ width: "100%" }}>
         <h3>Buscar produto por característica:</h3>
@@ -169,7 +166,7 @@ function Stock() {
       ) : (
         <ItemsTable tableData={stock} fetchData={fetchData} />
       )}
-    </>
+    </ItemContext.Provider>
   );
 }
 

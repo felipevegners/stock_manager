@@ -3,12 +3,24 @@ import Dashboard from "./pages/Dashboard";
 import Stock from "./pages/Stock";
 import Orders from "./pages/Orders";
 import Customers from "./pages/Customers";
+import AddItemForm from "./components/AddItemForm";
+import Batches from "./pages/Batch";
 
 function AppRoutes() {
   return (
     <Routes>
       <Route path="/" index element={<Dashboard />} />
-      <Route path="/stock" element={<Stock />} />
+      <Route path="/stock/add" element={<AddItemForm />} />
+      <Route path="/stock/list" element={<Stock />} />
+      <Route path="/stock/batch" element={<Batches />} />
+      <Route
+        path="/stock/category"
+        element={
+          <>
+            <h1>Cadastrar Categorias de Produtos</h1>
+          </>
+        }
+      />
       <Route path="/orders" element={<Orders />} />
       <Route path="/customers" element={<Customers />} />
     </Routes>
