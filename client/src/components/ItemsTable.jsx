@@ -14,6 +14,7 @@ import {
 } from "antd";
 import { QuestionCircleOutlined } from "@ant-design/icons";
 import { deleteItem, updateItem } from "../controllers/ItemController";
+import { currencyHelper } from "../helpers/CurrencyHelper";
 
 const statusOptions = [
   {
@@ -92,9 +93,7 @@ const ItemsTable = ({ tableData, fetchData }) => {
       capacity: record.capacity,
       battery: record.battery,
       details: record.details,
-      unitPrice: parseFloat(record.unitPrice, 2),
-      tax: parseFloat(record.tax, 2),
-      profit: parseFloat(record.profit, 2),
+      itemCosts: parseFloat(record.itemCosts, 2),
       status: record.status,
       isAvailable: record.isAvailable
     });
@@ -158,6 +157,16 @@ const ItemsTable = ({ tableData, fetchData }) => {
 
   const columns = [
     {
+      title: "Lote",
+      dataIndex: "batch",
+      editable: false,
+      width: 100,
+      fixed: "left",
+      render: (text) => {
+        return <>{text?.name}</>;
+      }
+    },
+    {
       title: "IMEI",
       dataIndex: "imei",
       editable: true,
@@ -179,19 +188,13 @@ const ItemsTable = ({ tableData, fetchData }) => {
       title: "Capacidade",
       dataIndex: "capacity",
       editable: true,
-      width: "5%",
-      render: (text) => {
-        return <>{text} GB</>;
-      }
+      width: "5%"
     },
     {
       title: "Bateria",
       dataIndex: "battery",
       editable: true,
-      width: "5%",
-      render: (text) => {
-        return <>{text}%</>;
-      }
+      width: "5%"
     },
     {
       title: "Detalhes",
@@ -200,76 +203,19 @@ const ItemsTable = ({ tableData, fetchData }) => {
       width: "10%"
     },
     {
-      title: "Lote",
-      dataIndex: "batch",
-      editable: true,
-      width: "8%",
-      render: (text) => {
-        return <>{text?.name}</>;
-      }
-    },
-    {
-      title: "Custo",
-      dataIndex: "unitPrice",
-      editable: true,
-      width: "8%",
-      render: (text) => {
-        return (
-          <>
-            {new Intl.NumberFormat("pt-BR", {
-              style: "currency",
-              currency: "BRL"
-            }).format(text)}
-          </>
-        );
-      }
-    },
-    // {
-    //   title: "Taxa",
-    //   dataIndex: "tax",
-    //   editable: true,
-    //   with: "4%",
-    //   render: (text) => {
-    //     return (
-    //       <>
-    //         {new Intl.NumberFormat("pt-BR", {
-    //           style: "currency",
-    //           currency: "BRL"
-    //         }).format(text)}
-    //       </>
-    //     );
-    //   }
-    // },
-    {
-      title: "Margem",
-      dataIndex: "profit",
-      editable: true,
-      with: "5%",
-      render: (text) => {
-        return (
-          <>
-            {new Intl.NumberFormat("pt-BR", {
-              style: "currency",
-              currency: "BRL"
-            }).format(text)}
-          </>
-        );
-      }
-    },
-    {
-      title: "Valor Venda",
-      dataIndex: "finalPrice",
+      title: "Custo USD",
+      dataIndex: "itemCosts",
       editable: false,
-      with: "5%",
-      render: (_, text) => {
-        return (
-          <>
-            {new Intl.NumberFormat("pt-BR", {
-              style: "currency",
-              currency: "BRL"
-            }).format(text.unitPrice + text.profit)}
-          </>
-        );
+      render: (text) => {
+        return <>{currencyHelper(text, "en-US", "USD")}</>;
+      }
+    },
+    {
+      title: "Custo Total",
+      dataIndex: "totalCosts",
+      editable: false,
+      render: (text) => {
+        return <>{currencyHelper(text)}</>;
       }
     },
     {

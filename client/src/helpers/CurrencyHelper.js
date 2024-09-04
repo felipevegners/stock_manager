@@ -1,4 +1,6 @@
-export const currencyHelper = (value) => {
-        return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL"}).format(value ? value : 0.00);
-
-}
+export const currencyHelper = (value, locale, currency) => {
+  return new Intl.NumberFormat(locale ? locale : "pt-BR", {
+    style: "currency",
+    currency: currency ? currency : "BRL"
+  }).format(value);
+};

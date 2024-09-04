@@ -1,7 +1,16 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { useEffect, useRef, useState } from "react";
-import { Button, Col, Divider, Form, Input, message, Row } from "antd";
+import {
+  Button,
+  Col,
+  Divider,
+  Form,
+  Input,
+  InputNumber,
+  message,
+  Row
+} from "antd";
 import {
   createCustomer,
   updateCustomer
@@ -129,6 +138,7 @@ function AddCustomerForm({
             <Form.Item
               label="CPF ou CNPJ"
               name="document"
+              width={"auto"}
               rules={[
                 {
                   required: true,
@@ -136,7 +146,7 @@ function AddCustomerForm({
                 }
               ]}
             >
-              <MaskedInput
+              {/* <MaskedInput
                 ref={inputDocument}
                 mask={
                   document.length < 15 ? "000.000.000-00" : "00.000.000/0001-00"
@@ -144,8 +154,14 @@ function AddCustomerForm({
                 value={document}
                 onChange={(event) => handleDocument(event)}
                 className="ant-input ant-input-lg css-dev-only-do-not-override-d2lrxs ant-input-outlined ant-input-status-success"
+              /> */}
+              <InputNumber
+                ref={inputDocument}
+                formatter={(value) =>
+                  value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/g, "$1.$2.$3-$4")
+                }
+                maxLength={11}
               />
-              {/* <Input ref={inputDocument} /> */}
             </Form.Item>
             <Form.Item
               label="Telefone"

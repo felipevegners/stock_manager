@@ -20,12 +20,6 @@ export const getStock = async (data) => {
       where: {
         AND: [
           {
-            batch: {
-              contains: batch,
-              mode: "insensitive"
-            }
-          },
-          {
             imei: {
               contains: imei
             }
@@ -59,7 +53,7 @@ export const getStock = async (data) => {
               contains: status,
               mode: "insensitive"
             }
-          },
+          }
         ]
       }
     });
@@ -118,7 +112,6 @@ export const updateStockItem = async (data) => {
 };
 
 export const deleteStockItem = async (data) => {
-
   const { id } = data;
 
   const deletedItem = await prisma.item.delete({

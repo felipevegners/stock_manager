@@ -13,20 +13,22 @@ import {
   Table,
   Space,
   Typography,
-  message
+  message,
+  InputNumber
 } from "antd";
 
 const { TextArea } = Input;
 import { OrderContext } from "../pages/Orders/OrderContext";
-
-import { getDate } from "../helpers/DateHelper";
 import { currencyHelper } from "../helpers/CurrencyHelper";
+import { currencyFormatter } from "../helpers/CurrencyFormatter";
+
 import {
   CloseOutlined,
   CheckSquareOutlined,
   PrinterOutlined,
   SaveOutlined
 } from "@ant-design/icons";
+import OrderItemsTable from "./OrderItemsTable";
 
 const { Option } = Select;
 
@@ -65,24 +67,27 @@ function AddNewOrderForm() {
 
   const itemsColumns = [
     {
+      title: "Lote",
+      dataIndex: "batch",
+      render: (record) => {
+        return <>{record.name}</>;
+      }
+    },
+    {
       title: "IMEI",
-      dataIndex: "imei",
-      width: "10%"
+      dataIndex: "imei"
     },
     {
       title: "Modelo",
-      dataIndex: "model",
-      with: "10%"
+      dataIndex: "model"
     },
     {
       title: "Cor",
-      dataIndex: "color",
-      width: "8%"
+      dataIndex: "color"
     },
     {
       title: "Capacidade",
       dataIndex: "capacity",
-      width: "5%",
       render: (text) => {
         return <>{text} GB</>;
       }
@@ -90,7 +95,6 @@ function AddNewOrderForm() {
     {
       title: "Bateria",
       dataIndex: "battery",
-      width: "5%",
       render: (text) => {
         return <>{text}%</>;
       }
@@ -101,98 +105,11 @@ function AddNewOrderForm() {
       width: "15%"
     },
     {
-      title: "Custo",
-      dataIndex: "unitPrice",
+      title: "Preço Custo",
+      dataIndex: "totalCosts",
       width: "8%",
       render: (text) => {
-        return (
-          <>
-            {new Intl.NumberFormat("pt-BR", {
-              style: "currency",
-              currency: "BRL"
-            }).format(text)}
-          </>
-        );
-      }
-    },
-    {
-      title: "Taxa",
-      dataIndex: "tax",
-      with: "5%",
-      render: (text) => {
-        return (
-          <>
-            {" "}
-            {new Intl.NumberFormat("pt-BR", {
-              style: "currency",
-              currency: "BRL"
-            }).format(text)}
-          </>
-        );
-      }
-    },
-    {
-      title: "Margem",
-      dataIndex: "profit",
-      with: "5%",
-      render: (text) => {
-        return (
-          <>
-            {" "}
-            {new Intl.NumberFormat("pt-BR", {
-              style: "currency",
-              currency: "BRL"
-            }).format(text)}
-          </>
-        );
-      }
-    },
-    {
-      title: "Valor Venda",
-      with: "5%",
-      render: (text, record) => {
-        return (
-          <>
-            {new Intl.NumberFormat("pt-BR", {
-              style: "currency",
-              currency: "BRL"
-            }).format(record.unitPrice + record.profit)}
-          </>
-        );
-      }
-    }
-  ];
-
-  const finalColumns = [
-    {
-      title: "Produto",
-      dataIndex: ["imei", "model", "color", "capacity", "battery"],
-      render: (_, record) => {
-        return (
-          <Typography.Text>
-            IMEI {record.imei} - {record.model} - {record.color} -{" "}
-            {record.capacity}
-            GB - Bateria {record.battery}%
-          </Typography.Text>
-        );
-      }
-    },
-    {
-      title: "Detalhes",
-      dataIndex: "details"
-    },
-    {
-      title: "Valor",
-      dataIndex: "tax",
-      render: (text, record) => {
-        return (
-          <>
-            {new Intl.NumberFormat("pt-BR", {
-              style: "currency",
-              currency: "BRL"
-            }).format(record.unitPrice + record.profit)}
-          </>
-        );
+        return currencyHelper(text);
       }
     }
   ];
@@ -208,7 +125,12 @@ function AddNewOrderForm() {
 
   const rowSelection = {
     onChange: (_, selectedRows) => {
-      setSelectedItems(selectedRows);
+      const addSellPrice = selectedRows.map((item) => ({
+        ...item,
+        sellPrice: parseFloat("0.00", 2)
+      }));
+
+      setSelectedItems(addSellPrice);
     }
   };
   const hasSelected = selectedItems.length > 0;
@@ -256,14 +178,12 @@ function AddNewOrderForm() {
     }
   };
 
-  const handleFreightPrice = (e) => {
-    e.preventDefault();
-    if (e.target.value) setFreightPrice(e.target.value);
+  const handleFreightPrice = (value) => {
+    if (value) setFreightPrice(value);
     else setFreightPrice(0);
   };
 
   const handlePickupBy = (e) => {
-    e.preventDefault();
     setPickupBy(e.target.value);
   };
 
@@ -303,32 +223,32 @@ function AddNewOrderForm() {
       observations: inputObservations.current.resizableTextArea.textArea.value,
       isDraft: false
     };
+    console.log(newOrderData);
 
-    createNewOrder(newOrderData).then((result) => {
-      if (result?.response?.status === 400) {
-        message.error("Pedido não criado. Verifique os dados inseridos.");
-      } else {
-        message.success(result.message);
-      }
-    });
+    // createNewOrder(newOrderData).then((result) => {
+    //   if (result?.response?.status === 400) {
+    //     message.error("Pedido não criado. Verifique os dados inseridos.");
+    //   } else {
+    //     message.success(result.message);
+    //   }
+    // });
 
-    turnItemsUnavailable(newOrderData.items);
+    // turnItemsUnavailable(newOrderData.items);
   };
 
   const onFinish = () => {
     addNewOrder();
     setTimeout(() => {
-      form.resetFields();
-      setSelectedItems([]);
-      setAddNewOrderForm(false);
-      fetchData();
+      // form.resetFields();
+      // setSelectedItems([]);
+      // setAddNewOrderForm(false);
+      // fetchData();
     }, 1000);
   };
 
   useEffect(() => {
     calculateOrderPrice();
     addKey();
-    console.log(orderStatus);
   }, [selectedItems, freigtPrice, orderStatus]);
 
   return (
@@ -477,11 +397,12 @@ function AddNewOrderForm() {
                     { required: true, message: "Insira o valor do frete" }
                   ]}
                 >
-                  <Input
+                  <InputNumber
                     ref={inputFreightPrice}
-                    onChange={handleFreightPrice}
+                    onChange={(value) => handleFreightPrice(value)}
                     addonBefore="R$"
-                    step="0.01"
+                    formatter={(value) => currencyFormatter(value)}
+                    parser={(value) => value?.replace(/\$\s?|(,*)/g, "")}
                   />
                 </Form.Item>
               </Col>
@@ -549,12 +470,7 @@ function AddNewOrderForm() {
           <Row>
             <Divider />
             <Col span={24}>
-              <Table
-                columns={finalColumns}
-                dataSource={selectedItems}
-                pagination={false}
-                rowKey={selectedItems.id}
-              />
+              <OrderItemsTable items={selectedItems} />
               <Divider />
             </Col>
           </Row>
@@ -570,7 +486,7 @@ function AddNewOrderForm() {
             </Col>
             <Col span={8}>
               <h3>
-                Valor do frete: <strong>{currencyHelper(freigtPrice)}</strong>
+                Valor do frete: <strong>{freigtPrice}</strong>
               </h3>
               <h4>
                 <strong>Observações: </strong>

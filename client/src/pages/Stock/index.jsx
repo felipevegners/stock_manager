@@ -10,8 +10,8 @@ import {
   message
 } from "antd";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
-// import AddItemForm from "../../components/AddItemForm";
 import { getItems } from "../../controllers/ItemController";
+import { getBatches } from "../../controllers/BatchController";
 import Link from "antd/es/typography/Link";
 import ItemsTable from "../../components/ItemsTable";
 import { ItemContext } from "./ItemContext";
@@ -22,11 +22,11 @@ const { Search } = Input;
 
 function Stock() {
   const [stock, setStock] = useState([]);
+
   const [searchFor, setSearchFor] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [searchMode, setSearchMode] = useState(false);
   const [showSearchAlert, setShowSearchAlert] = useState(false);
-  // const [viewAddNewItem, setViewAddNewItem] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   const navigate = useNavigate();
@@ -94,7 +94,7 @@ function Stock() {
   }, []);
 
   return (
-    <ItemContext.Provider value={fetchData}>
+    <ItemContext.Provider value={{ fetchData }}>
       <Space direction="horizontal" size="large" style={{ width: "100%" }}>
         <h1>Estoque Ativo</h1>
         <Button
@@ -106,23 +106,6 @@ function Stock() {
           Adicionar produto
         </Button>
       </Space>
-      {/* {viewAddNewItem && (
-        <>
-          <Divider />
-          <Space
-            direction="vertical"
-            size="large"
-            style={{ display: "flex", width: "100%" }}
-          >
-            <Card
-              title="Adicionar produto"
-              extra={<CloseOutlined onClick={() => setViewAddNewItem(false)} />}
-            >
-              <AddItemForm />
-            </Card>
-          </Space>
-        </>
-      )} */}
       <Divider />
       <Space direction="vertical" size={"large"} style={{ width: "100%" }}>
         <h3>Buscar produto por característica:</h3>

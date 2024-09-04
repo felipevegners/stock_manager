@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Button,
@@ -8,56 +8,56 @@ import {
   Form,
   Input,
   InputNumber,
+  Popover,
   Row,
   Select,
   Space,
   Typography,
   message
 } from "antd";
-import { CurrencyInput } from "react-currency-mask";
 import { createItem } from "../controllers/ItemController";
+import { getBatches } from "../controllers/BatchController";
+import { QuestionCircleFilled } from "@ant-design/icons";
+import { currencyHelper } from "../helpers/CurrencyHelper";
+import TextArea from "antd/es/input/TextArea";
 
 // eslint-disable-next-line react/prop-types
 function AddItemForm() {
-  const inputImei = useRef();
-  const inputModel = useRef();
-  const inputColor = useRef();
-  const inputCapacity = useRef();
-  const inputBattery = useRef();
-  const inputUnitPrice = useRef();
-  const inputTax = useRef();
-  const inputProfit = useRef();
-  const inputFinalPrice = useRef();
-  const inputStatus = useRef();
-  const inputDetails = useRef();
+  const [batches, setBatches] = useState([]);
+  const [selectedBatch, setSelectedBatch] = useState([]);
+  const [showBatchData, setShowBatchData] = useState(false);
 
   const navigate = useNavigate();
-
-  // const { fetchData } = useContext(ItemContext);
-
   const [form] = Form.useForm();
 
-  const addNewItem = () => {
-    const itemStatus = inputStatus.current.nativeElement.innerText;
+  const addNewItem = (values) => {
+    const {
+      imei,
+      model,
+      color,
+      capacity,
+      battery,
+      details,
+      status,
+      itemCosts,
+      totalCosts
+    } = values;
 
     const newItemData = {
-      imei: inputImei.current.input.value,
-      model: inputModel.current.input.value,
-      color: inputColor.current.input.value,
-      capacity: inputCapacity.current.input.value,
-      battery: inputBattery.current.input.value,
-      unitPrice: parseFloat(inputUnitPrice.current.value, 2),
-      tax: parseFloat(inputTax.current.value, 2),
-      profit: parseFloat(inputProfit.current.value, 2),
-      status: inputStatus.current.nativeElement.innerText,
-      details: inputDetails.current.input.value,
+      batch: { id: selectedBatch[0].id, name: selectedBatch[0].batchName },
+      imei,
+      model,
+      color,
+      capacity,
+      battery,
+      details,
+      itemCosts: parseFloat(itemCosts, 2),
+      totalCosts: parseFloat(totalCosts, 2),
+      status,
       isAvailable:
-        itemStatus === "Em trânsito"
-          ? false
-          : itemStatus === "Reparo"
-          ? false
-          : true
+        status === "Em trânsito" ? false : status === "Reparo" ? false : true
     };
+
     createItem(newItemData).then((result) => {
       if (result?.response?.status === 400)
         message.error("Produto não cadastrado. Verifique os dados inseridos.");
@@ -67,20 +67,81 @@ function AddItemForm() {
     });
   };
 
-  const calculateFinalPrice = () => {
-    const unitPrice = parseFloat(inputUnitPrice.current.value, 2);
-    const profit = parseFloat(inputProfit.current.value, 2);
-    const sum = unitPrice + profit;
-    form.setFieldValue("finalPrice", sum);
+  const fetchData = async () => {
+    await getBatches().then((result) => {
+      if (result?.response?.status === 400) {
+        message.error("Lotes não encontrados. Tente novamente!");
+      } else {
+        setBatches(result);
+      }
+    });
   };
 
-  const onFinish = () => {
-    addNewItem();
+  const handleSelectedBatch = (value) => {
+    const selectedBatch = batches.filter((batch) => batch.batchName === value);
+    setSelectedBatch(selectedBatch);
+    setShowBatchData(true);
+    form.setFieldsValue({
+      tax: selectedBatch[0].batchTax
+    });
+  };
+
+  const handleBatchDataInfo = () => {
+    return (
+      <>
+        <h3>
+          <strong>{selectedBatch[0]?.batchName}</strong>
+        </h3>
+        <hr />
+        <br />
+        <p>
+          <strong>Data: </strong>
+          {selectedBatch[0]?.batchDate}
+        </p>
+        <p>
+          <strong>Qtd Produtos: </strong>
+          {selectedBatch[0]?.batchQty}
+        </p>
+        <p>
+          <strong>Taxa USD: </strong>
+          {currencyHelper(selectedBatch[0]?.batchTax)}
+        </p>
+        <p>
+          <strong>Frete: </strong>
+          {currencyHelper(selectedBatch[0]?.batchFreight)}
+        </p>
+        <p>
+          <strong>Motoboy: </strong>
+          {currencyHelper(selectedBatch[0]?.batchBoyPrice)}
+        </p>
+      </>
+    );
+  };
+
+  const calculateFinalCosts = (value) => {
+    const itemCost = value;
+    const { batchTax, batchQty, batchFreight, batchBoyPrice } =
+      selectedBatch[0];
+    const brlCosts = itemCost * batchTax;
+    const ratedFreight = (batchFreight + batchBoyPrice) / batchQty;
+    const totalCosts = brlCosts + ratedFreight;
+
+    form.setFieldsValue({
+      totalCosts: totalCosts.toFixed(2)
+    });
+  };
+
+  const onFinish = (values) => {
+    addNewItem(values);
     form.resetFields();
     setTimeout(() => {
       navigate("/stock/list");
     }, 1000);
   };
+
+  useEffect(() => {
+    fetchData();
+  }, [selectedBatch]);
 
   return (
     <>
@@ -109,6 +170,39 @@ function AddItemForm() {
             }}
           >
             <Col span={6}>
+              <Form.Item label="Lote">
+                <Space>
+                  <Form.Item
+                    name="batch"
+                    noStyle
+                    rules={[
+                      {
+                        required: true,
+                        message: "Selecione o lote do item"
+                      }
+                    ]}
+                  >
+                    <Select
+                      style={{ width: 248 }}
+                      onSelect={(value) => handleSelectedBatch(value)}
+                    >
+                      {batches &&
+                        batches.map((batch) => (
+                          <Select.Option key={batch.id} value={batch.batchName}>
+                            {batch.batchName}
+                          </Select.Option>
+                        ))}
+                    </Select>
+                  </Form.Item>
+                  {showBatchData && (
+                    <Popover content={handleBatchDataInfo}>
+                      <QuestionCircleFilled
+                        style={{ color: "#bbb", fontSize: 16 }}
+                      />
+                    </Popover>
+                  )}
+                </Space>
+              </Form.Item>
               <Form.Item
                 label="IMEI"
                 name="imei"
@@ -119,7 +213,7 @@ function AddItemForm() {
                   }
                 ]}
               >
-                <Input ref={inputImei} />
+                <Input />
               </Form.Item>
               <Form.Item
                 label="Modelo"
@@ -131,7 +225,7 @@ function AddItemForm() {
                   }
                 ]}
               >
-                <Input ref={inputModel} />
+                <Input />
               </Form.Item>
               <Form.Item
                 label="Cor"
@@ -143,7 +237,7 @@ function AddItemForm() {
                   }
                 ]}
               >
-                <Input ref={inputColor} />
+                <Input />
               </Form.Item>
               <Form.Item
                 label="Capacidade"
@@ -155,7 +249,7 @@ function AddItemForm() {
                   }
                 ]}
               >
-                <Input ref={inputCapacity} type="number" />
+                <Input type="number" />
               </Form.Item>
               <Form.Item
                 label="Bateria"
@@ -167,24 +261,13 @@ function AddItemForm() {
                   }
                 ]}
               >
-                <Input ref={inputBattery} type="number" />
-              </Form.Item>
-              <Form.Item
-                label="Detalhes"
-                name="details"
-                rules={[
-                  {
-                    message: "Insira o detalhe do item"
-                  }
-                ]}
-              >
-                <Input ref={inputDetails} />
+                <Input type="number" />
               </Form.Item>
             </Col>
             <Col span={10} offset={2}>
               <Form.Item
-                label="Custo"
-                name="unitPrice"
+                label="Custo USD"
+                name="itemCosts"
                 rules={[
                   {
                     required: true,
@@ -194,56 +277,15 @@ function AddItemForm() {
               >
                 <InputNumber
                   step="0.01"
-                  ref={inputUnitPrice}
-                  addonBefore="R$"
-                  onChange={calculateFinalPrice}
+                  addonBefore="U$D"
+                  disabled={selectedBatch.length === 0}
+                  onChange={(value) => calculateFinalCosts(value)}
                 />
               </Form.Item>
-              <Form.Item
-                label="Taxa"
-                name="tax"
-                rules={[
-                  {
-                    required: true,
-                    message: "Insira a taxa negociada"
-                  }
-                ]}
-              >
-                <InputNumber step="0.01" ref={inputTax} addonBefore="R$" />
+              <Form.Item label="Custo Final" name="totalCosts">
+                <InputNumber step="0.01" addonBefore="R$" readOnly />
               </Form.Item>
-              <CurrencyInput
-                InputElement={
-                  <Form.Item
-                    label="Margem"
-                    name="profit"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Insira a margem de lucro"
-                      }
-                    ]}
-                  >
-                    <InputNumber
-                      step="0.01"
-                      ref={inputProfit}
-                      addonBefore="R$"
-                      name="profit"
-                      onChange={calculateFinalPrice}
-                    />
-                  </Form.Item>
-                }
-              />
 
-              <Form.Item label="Preço final (projeção)" name="finalPrice">
-                <InputNumber
-                  name="finalPrice"
-                  ref={inputFinalPrice}
-                  addonBefore="R$"
-                  step="0.01"
-                  style={{ width: "100%" }}
-                  readOnly
-                />
-              </Form.Item>
               <Form.Item
                 label="Status"
                 name="status"
@@ -254,11 +296,14 @@ function AddItemForm() {
                   }
                 ]}
               >
-                <Select ref={inputStatus}>
+                <Select>
                   <Select.Option value="Em trânsito">Em trânsito</Select.Option>
                   <Select.Option value="Em estoque">Em estoque</Select.Option>
                   <Select.Option value="Reparo">Reparo</Select.Option>
                 </Select>
+              </Form.Item>
+              <Form.Item label="Detalhes" name="details">
+                <TextArea />
               </Form.Item>
               <Button type="primary" htmlType="submit" size="large">
                 Cadastrar produto

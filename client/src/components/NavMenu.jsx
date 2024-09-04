@@ -26,7 +26,7 @@ const navigation = [
         label: "Gerenciar Estoque",
         children: [
           {
-            label: "Listar produtos",
+            label: "Produtos em Estoque",
             key: "/stock/list"
           },
           {
@@ -37,33 +37,39 @@ const navigation = [
       },
       {
         type: "group",
-        label: "Lotes e Categorias",
+        label: "Lotes",
         children: [
           {
-            label: "Listar Lotes",
+            label: "Gerenciar Lotes",
             key: "/stock/batch"
+          }
+        ]
+      },
+      {
+        type: "group",
+        label: "Categorias",
+        children: [
+          {
+            label: "Listar Categorias",
+            key: "/stock/category/list"
           },
           {
-            label: "Criar um Lote",
-            key: "/stock/batch/add"
-          },
-          {
-            label: "Listar categorias ",
-            key: "/stock/category"
+            label: "Adicionar categoria ",
+            key: "/stock/category/add"
           }
         ]
       }
     ]
   },
   {
-    label: "Clientes",
-    icon: <UserOutlined />,
-    key: "/customers"
-  },
-  {
     label: "Pedidos",
     icon: <FileDoneOutlined />,
     key: "/orders"
+  },
+  {
+    label: "Clientes",
+    icon: <UserOutlined />,
+    key: "/customers"
   },
   {
     label: "Relatórios",

@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
 }
 
 datasource db {
@@ -34,17 +34,16 @@ model category {
 
 model Item {
   id          String    @id @default(auto()) @map("_id") @db.ObjectId
-  batch       Json?
-  imei        String?
-  model       String?
-  color       String?
-  capacity    String?
-  battery     String?
-  details     String?
-  unitPrice   Float?
-  tax         Float?
-  profit      Float?
-  status      String?
+  batch       Json
+  imei        String
+  model       String
+  color       String
+  capacity    String
+  battery     String
+  details     String
+  itemCosts   Float
+  totalCosts  Float
+  status      String
   isAvailable Boolean   @default(true)
   createdAt   DateTime? @default(now())
   updatedAt   DateTime? @updatedAt()
