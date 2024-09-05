@@ -17,7 +17,8 @@ import {
   cancelOrder,
   createOrder,
   getOrders,
-  updateOrder
+  updateOrder,
+  deleteOrder
 } from "../../controllers/OrderController";
 import { currencyHelper } from "../../helpers/CurrencyHelper";
 import { dateFormat } from "../../helpers/DateHelper";
@@ -100,6 +101,12 @@ function Orders() {
                   Visualizar
                 </Typography.Link>
                 <Typography.Link>Editar</Typography.Link>
+                <Typography.Link
+                  style={{ color: "red" }}
+                  onClick={() => removeOrder(record)}
+                >
+                  Exluir
+                </Typography.Link>
               </Space>
             ) : (
               <></>
@@ -158,6 +165,21 @@ function Orders() {
         message.error("Pedido não cancelado. Verifique os dados inseridos.");
       else {
         message.success(result.message);
+        // handleItemsAvailability(order.items, true);
+      }
+    });
+  };
+
+  const removeOrder = async (order) => {
+    await deleteOrder(order.id).then((result) => {
+      if (result?.response?.status === 400)
+        message.error("Pedido não excluido. Tente novamente.");
+      else {
+        handleItemsAvailability(order.items, true);
+        message.success(result.message);
+        setTimeout(() => {
+          fetchData();
+        }, 1000);
       }
     });
   };
@@ -173,13 +195,19 @@ function Orders() {
     });
   };
 
-  const turnItemsUnavailable = (orderItems) => {
-    // console.log("orderItems -> ", orderItems);
+  const handleItemsAvailability = (orderItems, action) => {
     for (let item in orderItems) {
-      updateItem(orderItems[item].id, {
-        isAvailable: false,
-        status: "Pendente"
-      });
+      if (action === false) {
+        updateItem(orderItems[item].id, {
+          isAvailable: false,
+          status: "Pendente"
+        });
+      } else {
+        updateItem(orderItems[item].id, {
+          isAvailable: true,
+          status: "Em estoque"
+        });
+      }
     }
   };
 
@@ -192,7 +220,6 @@ function Orders() {
 
   useEffect(() => {
     fetchData();
-    // console.log("OrderNum -> ", newOrderNum);
   }, [newOrderNum]);
 
   return (
@@ -209,7 +236,7 @@ function Orders() {
           isViewModalOpen,
           setIsViewModalOpen,
           viewOrderModalContent,
-          turnItemsUnavailable,
+          handleItemsAvailability,
           fetchData
         }}
       >

@@ -16,8 +16,8 @@ function ViewOrderModal() {
       render: (_, record) => {
         return (
           <p>
-            {record.imei} - {record.model} - {record.color} - {record.capacity}
-            GB - Bateria {record.battery}%
+            {record.imei} - {record.model} - {record.capacity}
+            GB - {record.color} - Bateria {record.battery}%
           </p>
         );
       }
@@ -28,16 +28,9 @@ function ViewOrderModal() {
     },
     {
       title: "Valor",
-      dataIndex: "tax",
-      render: (text, record) => {
-        return (
-          <>
-            {new Intl.NumberFormat("pt-BR", {
-              style: "currency",
-              currency: "BRL"
-            }).format(record.unitPrice + record.profit)}
-          </>
-        );
+      dataIndex: "sellPrice",
+      render: (_, record) => {
+        return <>{currencyHelper(record.sellPrice)}</>;
       }
     }
   ];
@@ -115,7 +108,7 @@ function ViewOrderModal() {
               <Table
                 columns={finalColumns}
                 dataSource={viewOrderModalContent[0].items}
-                rowKey={viewOrderModalContent[0].id}
+                rowKey={viewOrderModalContent[0]?.id}
                 pagination={false}
               />
               <Divider />

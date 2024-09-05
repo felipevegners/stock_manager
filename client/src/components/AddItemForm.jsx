@@ -62,6 +62,10 @@ function AddItemForm() {
       if (result?.response?.status === 400)
         message.error("Produto não cadastrado. Verifique os dados inseridos.");
       else {
+        form.resetFields();
+        setTimeout(() => {
+          navigate("/stock/list");
+        }, 1000);
         message.success(result.message);
       }
     });
@@ -133,10 +137,6 @@ function AddItemForm() {
 
   const onFinish = (values) => {
     addNewItem(values);
-    form.resetFields();
-    setTimeout(() => {
-      navigate("/stock/list");
-    }, 1000);
   };
 
   useEffect(() => {

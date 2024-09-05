@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { useContext, useEffect, useRef, useState } from "react";
@@ -39,7 +40,7 @@ function AddNewOrderForm() {
     setAddNewOrderForm,
     newOrderNum,
     createNewOrder,
-    turnItemsUnavailable,
+    handleItemsAvailability,
     fetchData
   } = useContext(OrderContext);
 
@@ -56,6 +57,7 @@ function AddNewOrderForm() {
   const [paymentMethod, setPaymentMethod] = useState({});
   const [orderStatus, setOrderStatus] = useState(null);
   const [orderObservations, setOrderObservations] = useState("");
+  const [pricedItemsData, setPricedItemsData] = useState([]);
 
   const inputCustomerName = useRef();
   const inputPickupBy = useRef();
@@ -188,30 +190,30 @@ function AddNewOrderForm() {
   };
 
   const calculateOrderPrice = () => {
-    const totalUnitPrice = selectedItems?.reduce((acc, obj) => {
-      return acc + obj.unitPrice;
-    }, 0);
+    if (pricedItemsData.length > 0) {
+      const totalItemsPrice = pricedItemsData?.reduce((acc, obj) => {
+        return acc + obj.sellPrice;
+      }, 0);
 
-    const totalProfit = selectedItems?.reduce((acc, obj) => {
-      return acc + obj.profit;
-    }, 0);
+      const totalOrder = totalItemsPrice + freigtPrice;
 
-    const itemsTotal = totalUnitPrice + totalProfit;
-    const orderTotal = itemsTotal + parseFloat(freigtPrice, 2);
-
-    setTotalItemsPrice(itemsTotal);
-    setTotalOrderPrice(orderTotal);
+      setTotalItemsPrice(totalItemsPrice);
+      setTotalOrderPrice(totalOrder);
+    } else {
+      setTotalItemsPrice(0);
+      setTotalOrderPrice(0);
+    }
   };
 
   const handleOrderObservations = (e) => {
     setOrderObservations(e.target.value);
   };
 
-  const addNewOrder = () => {
+  const addNewOrder = (values) => {
     const newOrderData = {
       orderNum: newOrderNum,
       customer: selectedCustomer,
-      items: [...selectedItems],
+      items: pricedItemsData,
       shipping: {
         method: deliveryMethod,
         costs: freigtPrice,
@@ -220,36 +222,43 @@ function AddNewOrderForm() {
       orderValue: totalOrderPrice,
       payment: paymentMethod,
       status: orderStatus,
-      observations: inputObservations.current.resizableTextArea.textArea.value,
+      observations: values.observations ? values.observations : "-",
       isDraft: false
     };
-    console.log(newOrderData);
 
-    // createNewOrder(newOrderData).then((result) => {
-    //   if (result?.response?.status === 400) {
-    //     message.error("Pedido não criado. Verifique os dados inseridos.");
-    //   } else {
-    //     message.success(result.message);
-    //   }
-    // });
-
-    // turnItemsUnavailable(newOrderData.items);
+    createNewOrder(newOrderData).then((result) => {
+      if (result?.response?.status === 400) {
+        message.error("Pedido não criado. Verifique os dados inseridos.");
+      } else {
+        setTimeout(() => {
+          form.resetFields();
+          setSelectedItems([]);
+          setAddNewOrderForm(false);
+          setPricedItemsData([]);
+          fetchData();
+        }, 1000);
+        handleItemsAvailability(newOrderData.items, false);
+        message.success(result.message);
+      }
+    });
   };
 
-  const onFinish = () => {
-    addNewOrder();
-    setTimeout(() => {
-      // form.resetFields();
-      // setSelectedItems([]);
-      // setAddNewOrderForm(false);
-      // fetchData();
-    }, 1000);
+  const onFinish = (values) => {
+    addNewOrder(values);
   };
 
   useEffect(() => {
-    calculateOrderPrice();
+    if (pricedItemsData) {
+      calculateOrderPrice();
+    }
     addKey();
-  }, [selectedItems, freigtPrice, orderStatus]);
+  }, [
+    selectedItems,
+    pricedItemsData,
+    totalOrderPrice,
+    freigtPrice,
+    orderStatus
+  ]);
 
   return (
     <>
@@ -401,8 +410,11 @@ function AddNewOrderForm() {
                     ref={inputFreightPrice}
                     onChange={(value) => handleFreightPrice(value)}
                     addonBefore="R$"
-                    formatter={(value) => currencyFormatter(value)}
-                    parser={(value) => value?.replace(/\$\s?|(,*)/g, "")}
+                    // formatter={(value) => currencyFormatter(value)}
+                    formatter={(value) =>
+                      value.replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+                    }
+                    parser={(value) => value?.replace(/\s?|(.*)/g, "")}
                   />
                 </Form.Item>
               </Col>
@@ -470,7 +482,10 @@ function AddNewOrderForm() {
           <Row>
             <Divider />
             <Col span={24}>
-              <OrderItemsTable items={selectedItems} />
+              <OrderItemsTable
+                items={selectedItems}
+                setPricedItemsData={setPricedItemsData}
+              />
               <Divider />
             </Col>
           </Row>
@@ -486,7 +501,7 @@ function AddNewOrderForm() {
             </Col>
             <Col span={8}>
               <h3>
-                Valor do frete: <strong>{freigtPrice}</strong>
+                Valor do frete: <strong>{currencyHelper(freigtPrice)}</strong>
               </h3>
               <h4>
                 <strong>Observações: </strong>

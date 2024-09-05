@@ -1,19 +1,11 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import React, { useContext, useEffect, useRef, useState } from "react";
-import {
-  Button,
-  Form,
-  Input,
-  InputNumber,
-  Popconfirm,
-  Space,
-  Table,
-  Typography
-} from "antd";
+import { Form, InputNumber, Table, Typography } from "antd";
 import { currencyHelper } from "../helpers/CurrencyHelper";
-import { currencyFormatter } from "../helpers/CurrencyFormatter";
+// import { currencyFormatter } from "../helpers/CurrencyFormatter";
 import "../pages/Orders/styles.css";
+
 const EditableContext = React.createContext(null);
 const EditableRow = ({ index, ...props }) => {
   const [form] = Form.useForm();
@@ -78,7 +70,7 @@ const EditableCell = ({
           }
         ]}
       >
-        <Input
+        <InputNumber
           addonBefore="R$"
           ref={inputRef}
           onPressEnter={save}
@@ -97,7 +89,7 @@ const EditableCell = ({
   return <td {...restProps}>{childNode}</td>;
 };
 
-const OrderItemsTable = ({ items }) => {
+const OrderItemsTable = ({ items, setPricedItemsData }) => {
   const [dataSource, setDataSource] = useState(items);
 
   const finalColumns = [
@@ -120,8 +112,8 @@ const OrderItemsTable = ({ items }) => {
       dataIndex: "details"
     },
     {
-        title: "Preço Custo",
-        width: "12%",
+      title: "Preço Custo",
+      width: "12%",
       render: (record) => {
         return currencyHelper(record.totalCosts);
       }
@@ -155,6 +147,7 @@ const OrderItemsTable = ({ items }) => {
       ...row
     });
     setDataSource(newData);
+    setPricedItemsData(newData);
   };
   const components = {
     body: {
