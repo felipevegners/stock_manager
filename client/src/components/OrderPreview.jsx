@@ -9,50 +9,33 @@ function OrderPreview({
   pickupBy,
   freigtPrice,
   orderObservations,
-  paymentMethod
+  paymentMethod,
+  selectedItems,
+  totalItemsPrice,
+  totalOrderPrice
 }) {
   const finalColumns = [
     {
       title: "Produto",
       dataIndex: ["imei", "model", "color", "capacity", "battery"],
-      width: "30%",
+      width: "60%",
       render: (_, record) => {
         return (
           <Typography.Text>
             IMEI {record.imei} - {record.model} - {record.capacity} GB -{" "}
-            {record.color} - Bateria {record.battery}%
+            {record.color} - Bateria {record.battery}%{" "}
+            {record.details === null ? "(Sem detalhes)" : `(${record.details})`}
           </Typography.Text>
         );
       }
     },
     {
-      title: "Detalhes",
-      width: "30%",
-      dataIndex: "details"
-    },
-    {
-      title: "Preço Custo",
-      width: "12%",
-      render: (record) => {
-        return currencyHelper(record.totalCosts);
-      }
-    },
-    {
-      title: "Valor Venda",
+      title: "Valor Unitário",
       dataIndex: "sellPrice",
       editable: true,
       width: "12%",
       render: (text) => {
         return currencyHelper(text);
-      }
-    },
-    {
-      title: "Lucro",
-      width: "16%",
-      render: (record) => {
-        return record.sellPrice === 0
-          ? ""
-          : currencyHelper(record.sellPrice - record.totalCosts);
       }
     }
   ];
@@ -107,18 +90,25 @@ function OrderPreview({
       <Row>
         <Divider />
         <Col span={24}>
-          <Table bordered dataSource={[]} columns={[]} />
+          <Table
+            bordered
+            dataSource={selectedItems}
+            columns={finalColumns}
+            rowKey={(record) => record.id}
+            style={{ height: 600 }}
+            pagination={false}
+          />
           <Divider />
         </Col>
       </Row>
       <Row>
         <Col span={8}>
           <h2>
-            Total de items: <strong>{"selectedItems.length"}</strong>
+            Total de items: <strong>{selectedItems.length}</strong>
           </h2>
           <h2>
             Valor total dos itens:{" "}
-            <strong>{"currencyHelper(totalItemsPrice)"}</strong>
+            <strong>{currencyHelper(totalItemsPrice)}</strong>
           </h2>
         </Col>
         <Col span={8}>
@@ -132,7 +122,7 @@ function OrderPreview({
         </Col>
         <Col span={8} style={{ backgroundColor: "#ccc", padding: 12 }}>
           <h2>
-            Valor total: <strong>{"currencyHelper(totalOrderPrice)"}</strong>
+            Valor total: <strong>{currencyHelper(totalOrderPrice)}</strong>
           </h2>
           <h3>
             Forma de Pgto:{" "}

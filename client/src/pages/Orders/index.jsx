@@ -54,6 +54,7 @@ function Orders() {
     items: []
   });
   const [selectedItems, setSelectedItems] = useState([]);
+  const [pricedItemsData, setPricedItemsData] = useState([]);
 
   const columns = [
     {
@@ -189,7 +190,7 @@ function Orders() {
       const sanitizedItems = availableItems.map((v, index) => ({
         ...v,
         key: index,
-        sellPrice: 0
+        sellPrice: null
       }));
       setItemsAvailable(sanitizedItems);
     });
@@ -362,6 +363,8 @@ function Orders() {
           isViewModalOpen,
           selectedItems,
           setSelectedItems,
+          pricedItemsData,
+          setPricedItemsData,
           setAddNewOrderForm,
           createNewOrder,
           handleUpDateOrder,

@@ -2,6 +2,7 @@
 /* eslint-disable react/prop-types */
 import { useContext, useEffect, useState } from "react";
 import {
+  Button,
   Divider,
   Form,
   Input,
@@ -76,7 +77,7 @@ const PricedItemsTable = () => {
     );
   };
 
-  const { selectedItems } = useContext(OrderContext);
+  const { selectedItems, setSelectedItems } = useContext(OrderContext);
 
   const [form] = Form.useForm();
   const [data, setData] = useState(selectedItems);
@@ -104,10 +105,12 @@ const PricedItemsTable = () => {
           ...row
         });
         setData(newData);
+        setSelectedItems(newData);
         setEditingKey("");
       } else {
         newData.push(row);
         setData(newData);
+        setSelectedItems(newData);
         setEditingKey("");
       }
     } catch (errInfo) {
@@ -175,9 +178,25 @@ const PricedItemsTable = () => {
       title: "Lucro",
       width: 185,
       render: (record) => {
-        return record.sellPrice === 0
-          ? ""
+        return record.sellPrice === null
+          ? "R$ 0,00"
           : currencyHelper(record.sellPrice - record.totalCosts);
+      }
+    },
+    {
+      title: "Ações",
+      render: (record) => {
+        return (
+          <Button
+            type="primary"
+            size="medium"
+            danger
+            icon={<CloseOutlined />}
+            onClick={() => handleRemoveItem(record.id)}
+          >
+            Excluir
+          </Button>
+        );
       }
     }
   ];
@@ -198,6 +217,12 @@ const PricedItemsTable = () => {
     };
   });
 
+  const handleRemoveItem = (itemId) => {
+    const newData = selectedItems.filter((item) => item.id !== itemId);
+
+    setSelectedItems(newData);
+  };
+
   useEffect(() => {
     setData(selectedItems);
   }, [selectedItems]);
@@ -215,6 +240,7 @@ const PricedItemsTable = () => {
         columns={mergedColumns}
         rowClassName="editable-row"
         rowKey={(record) => record.id}
+        pagination={false}
       />
     </Form>
   );

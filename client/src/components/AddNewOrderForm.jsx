@@ -36,6 +36,8 @@ function AddNewOrderForm({ children }) {
     customersList,
     setAddNewOrderForm,
     newOrderNum,
+    selectedItems,
+    setSelectedItems,
     createNewOrder,
     handleItemsAvailability,
     fetchData
@@ -47,13 +49,11 @@ function AddNewOrderForm({ children }) {
   const [freigtPrice, setFreightPrice] = useState(null);
   const [selectedCustomer, setSelectedCustomer] = useState([]);
   const [pickupBy, setPickupBy] = useState("");
-  const [selectedItems, setSelectedItems] = useState([]);
   const [totalItemsPrice, setTotalItemsPrice] = useState(null);
   const [totalOrderPrice, setTotalOrderPrice] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState({});
   const [orderStatus, setOrderStatus] = useState(null);
   const [orderObservations, setOrderObservations] = useState("");
-  const [pricedItemsData, setPricedItemsData] = useState([]);
 
   const inputCustomerName = useRef();
   const inputPickupBy = useRef();
@@ -116,8 +116,8 @@ function AddNewOrderForm({ children }) {
   };
 
   const calculateOrderPrice = () => {
-    if (pricedItemsData.length > 0) {
-      const totalItemsPrice = pricedItemsData?.reduce((acc, obj) => {
+    if (selectedItems.length > 0) {
+      const totalItemsPrice = selectedItems?.reduce((acc, obj) => {
         return acc + obj.sellPrice;
       }, 0);
 
@@ -135,11 +135,11 @@ function AddNewOrderForm({ children }) {
     setOrderObservations(e.target.value);
   };
 
-  const addNewOrder = (values) => {
+  const addNewOrder = async (values) => {
     const newOrderData = {
       orderNum: newOrderNum,
       customer: selectedCustomer,
-      items: pricedItemsData,
+      items: selectedItems,
       shipping: {
         method: deliveryMethod,
         costs: freigtPrice,
@@ -160,11 +160,10 @@ function AddNewOrderForm({ children }) {
           form.resetFields();
           setSelectedItems([]);
           setAddNewOrderForm(false);
-          setPricedItemsData([]);
+          setSelectedItems([]);
           fetchData();
         }, 1000);
         handleItemsAvailability(newOrderData.items, "new order");
-        message.success(result.message);
       }
     });
   };
@@ -174,18 +173,10 @@ function AddNewOrderForm({ children }) {
   };
 
   useEffect(() => {
-    if (pricedItemsData?.length > 0) {
+    if (selectedItems?.length > 0) {
       calculateOrderPrice();
-    } else {
-      setPricedItemsData(null);
     }
-  }, [
-    selectedItems,
-    pricedItemsData,
-    totalOrderPrice,
-    freigtPrice,
-    orderStatus
-  ]);
+  }, [selectedItems, totalOrderPrice, freigtPrice, orderStatus]);
 
   return (
     <>
@@ -238,6 +229,7 @@ function AddNewOrderForm({ children }) {
               <h2>3 - Insira o valor de venda</h2>
               <Divider />
               <PricedItemsTable />
+              <br />
             </Col>
             <Col span={24}>
               <h2>4 - Frete e Pagamento</h2>
@@ -359,8 +351,12 @@ function AddNewOrderForm({ children }) {
           pickupBy,
           orderObservations,
           freigtPrice,
-          paymentMethod
+          paymentMethod,
+          selectedItems,
+          totalItemsPrice,
+          totalOrderPrice
         })}
+        <Divider />
         <Row>
           <Col span={12}>
             <Space>
