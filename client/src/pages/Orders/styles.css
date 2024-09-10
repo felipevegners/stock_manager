@@ -3,10 +3,13 @@
 }
 
 .editable-cell-value-wrap {
-  padding: 5px 12px;
+  padding: 4px 11px;
   cursor: pointer;
   height: 38px;
   line-height: 2;
+  color: #ff1648;
+  border: 1px solid #ff1648;
+  border-radius: 6px;
 }
 
 .editable-row:hover .editable-cell-value-wrap {

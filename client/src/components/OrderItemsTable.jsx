@@ -1,188 +1,108 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { Form, InputNumber, Table, Typography } from "antd";
+import React, { useContext } from "react";
+import { Button, Table } from "antd";
 import { currencyHelper } from "../helpers/CurrencyHelper";
-// import { currencyFormatter } from "../helpers/CurrencyFormatter";
-import "../pages/Orders/styles.css";
+import { OrderContext } from "../pages/Orders/OrderContext";
+import { PlusOutlined } from "@ant-design/icons";
 
-const EditableContext = React.createContext(null);
-const EditableRow = ({ index, ...props }) => {
-  const [form] = Form.useForm();
-  return (
-    <Form form={form} component={false}>
-      <EditableContext.Provider value={form}>
-        <tr {...props} />
-      </EditableContext.Provider>
-    </Form>
-  );
-};
-const EditableCell = ({
-  title,
-  editable,
-  children,
-  dataIndex,
-  record,
-  handleSave,
-  ...restProps
-}) => {
-  const [editing, setEditing] = useState(false);
-  const inputRef = useRef(null);
-  const form = useContext(EditableContext);
-  useEffect(() => {
-    if (editing) {
-      inputRef.current?.focus();
-    }
-  }, [editing]);
+const OrderItemsTable = () => {
+  const { itemsAvailable, selectedItems, setSelectedItems } =
+    useContext(OrderContext);
 
-  const toggleEdit = () => {
-    setEditing(!editing);
-    form.setFieldsValue({
-      [dataIndex]: record[dataIndex]
-    });
-  };
-
-  const save = async () => {
-    try {
-      const values = await form.validateFields();
-      toggleEdit();
-      handleSave({
-        ...record,
-        ...values
-      });
-    } catch (errInfo) {
-      console.log("Save failed:", errInfo);
-    }
-  };
-
-  let childNode = children;
-  if (editable) {
-    childNode = editing ? (
-      <Form.Item
-        style={{
-          margin: 0
-        }}
-        name={dataIndex}
-        rules={[
-          {
-            required: true,
-            message: "Insira o valor de venda."
-          }
-        ]}
-      >
-        <InputNumber
-          addonBefore="R$"
-          ref={inputRef}
-          onPressEnter={save}
-          onBlur={save}
-          controls={false}
-          value={""}
-          style={{ maxWidth: 180 }}
-        />
-      </Form.Item>
-    ) : (
-      <div className="editable-cell-value-wrap" onClick={toggleEdit}>
-        {children}
-      </div>
-    );
-  }
-  return <td {...restProps}>{childNode}</td>;
-};
-
-const OrderItemsTable = ({ items, setPricedItemsData }) => {
-  const [dataSource, setDataSource] = useState(items);
-
-  const finalColumns = [
+  const itemsColumns = [
     {
-      title: "Produto",
-      dataIndex: ["imei", "model", "color", "capacity", "battery"],
-      width: "30%",
-      render: (_, record) => {
-        return (
-          <Typography.Text>
-            IMEI {record.imei} - {record.model} - {record.capacity} GB -{" "}
-            {record.color} - Bateria {record.battery}%
-          </Typography.Text>
-        );
+      title: "Lote",
+      dataIndex: "batch",
+      render: (record) => {
+        return <>{record.name}</>;
+      }
+    },
+    {
+      title: "IMEI",
+      dataIndex: "imei"
+    },
+    {
+      title: "Modelo",
+      dataIndex: "model"
+    },
+    {
+      title: "Cor",
+      dataIndex: "color"
+    },
+    {
+      title: "Capacidade",
+      dataIndex: "capacity",
+      render: (text) => {
+        return <>{text} GB</>;
+      }
+    },
+    {
+      title: "Bateria",
+      dataIndex: "battery",
+      render: (text) => {
+        return <>{text}%</>;
       }
     },
     {
       title: "Detalhes",
-      width: "30%",
-      dataIndex: "details"
+      dataIndex: "details",
+      width: "15%"
     },
     {
       title: "Preço Custo",
-      width: "12%",
-      render: (record) => {
-        return currencyHelper(record.totalCosts);
-      }
-    },
-    {
-      title: "Valor Venda",
-      dataIndex: "sellPrice",
-      editable: true,
-      width: "12%",
+      dataIndex: "totalCosts",
+      width: "8%",
       render: (text) => {
         return currencyHelper(text);
       }
     },
     {
-      title: "Lucro",
-      width: "16%",
+      title: "Ação",
       render: (record) => {
-        return record.sellPrice === 0
-          ? ""
-          : currencyHelper(record.sellPrice - record.totalCosts);
+        return (
+          <Button
+            icon={<PlusOutlined />}
+            size="medium"
+            type="primary"
+            disabled={handleDisableButton(record.id)}
+            onClick={() => handleAddSelectedItem(record)}
+          >
+            Adicionar
+          </Button>
+        );
       }
     }
   ];
 
-  const handleSave = (row) => {
-    const newData = [...dataSource];
-    const index = newData.findIndex((item) => row.key === item.key);
-    const item = newData[index];
-    newData.splice(index, 1, {
-      ...item,
-      ...row
-    });
-    setDataSource(newData);
-    setPricedItemsData(newData);
-  };
-  const components = {
-    body: {
-      row: EditableRow,
-      cell: EditableCell
-    }
-  };
-  const columns = finalColumns?.map((col) => {
-    if (!col.editable) {
-      return col;
-    }
-    return {
-      ...col,
-      onCell: (record) => ({
-        record,
-        editable: col.editable,
-        dataIndex: col.dataIndex,
-        title: col.title,
-        handleSave
-      })
+  const handleAddSelectedItem = (record) => {
+    const newItem = {
+      id: record.id,
+      batch: record.batch,
+      imei: record.imei,
+      model: record.model,
+      color: record.color,
+      capacity: record.capacity,
+      battery: record.battery,
+      details: record.details,
+      totalCosts: record.totalCosts,
+      sellPrice: record.sellPrice
     };
-  });
+    setSelectedItems([...selectedItems, newItem]);
+  };
 
-  useEffect(() => {
-    setDataSource(items);
-  }, [items]);
+  const handleDisableButton = (itemId) => {
+    return selectedItems.find((el) => el.id === itemId);
+  };
 
   return (
     <>
       <Table
-        components={components}
-        rowClassName={() => "editable-row"}
         bordered
-        dataSource={dataSource}
-        columns={columns}
+        dataSource={itemsAvailable}
+        columns={itemsColumns}
+        rowKey={(record) => record.id}
       />
     </>
   );

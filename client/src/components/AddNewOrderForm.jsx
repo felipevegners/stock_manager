@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { useContext, useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   Button,
   Form,
@@ -11,32 +11,29 @@ import {
   Divider,
   Input,
   Select,
-  Table,
   Space,
-  Typography,
   message,
   InputNumber
 } from "antd";
 
 const { TextArea } = Input;
 import { OrderContext } from "../pages/Orders/OrderContext";
-import { currencyHelper } from "../helpers/CurrencyHelper";
-import { currencyFormatter } from "../helpers/CurrencyFormatter";
 
 import {
   CloseOutlined,
-  CheckSquareOutlined,
   PrinterOutlined,
-  SaveOutlined
+  SaveOutlined,
+  CheckCircleOutlined
 } from "@ant-design/icons";
+
+import PricedItemsTable from "./PricedItemsTable";
 import OrderItemsTable from "./OrderItemsTable";
 
 const { Option } = Select;
 
-function AddNewOrderForm() {
+function AddNewOrderForm({ children }) {
   const {
     customersList,
-    itemsAvailable,
     setAddNewOrderForm,
     newOrderNum,
     createNewOrder,
@@ -51,7 +48,6 @@ function AddNewOrderForm() {
   const [selectedCustomer, setSelectedCustomer] = useState([]);
   const [pickupBy, setPickupBy] = useState("");
   const [selectedItems, setSelectedItems] = useState([]);
-  const [stockItems, setStockItems] = useState([]);
   const [totalItemsPrice, setTotalItemsPrice] = useState(null);
   const [totalOrderPrice, setTotalOrderPrice] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState({});
@@ -66,76 +62,6 @@ function AddNewOrderForm() {
   const inputObservations = useRef();
 
   const [form] = Form.useForm();
-
-  const itemsColumns = [
-    {
-      title: "Lote",
-      dataIndex: "batch",
-      render: (record) => {
-        return <>{record.name}</>;
-      }
-    },
-    {
-      title: "IMEI",
-      dataIndex: "imei"
-    },
-    {
-      title: "Modelo",
-      dataIndex: "model"
-    },
-    {
-      title: "Cor",
-      dataIndex: "color"
-    },
-    {
-      title: "Capacidade",
-      dataIndex: "capacity",
-      render: (text) => {
-        return <>{text} GB</>;
-      }
-    },
-    {
-      title: "Bateria",
-      dataIndex: "battery",
-      render: (text) => {
-        return <>{text}%</>;
-      }
-    },
-    {
-      title: "Detalhes",
-      dataIndex: "details",
-      width: "15%"
-    },
-    {
-      title: "Preço Custo",
-      dataIndex: "totalCosts",
-      width: "8%",
-      render: (text) => {
-        return currencyHelper(text);
-      }
-    }
-  ];
-
-  const addKey = () => {
-    const itemsWithKey = itemsAvailable.map((v, index) => ({
-      ...v,
-      key: index
-    }));
-
-    setStockItems(itemsWithKey);
-  };
-
-  const rowSelection = {
-    onChange: (_, selectedRows) => {
-      const addSellPrice = selectedRows.map((item) => ({
-        ...item,
-        sellPrice: parseFloat("0.00", 2)
-      }));
-
-      setSelectedItems(addSellPrice);
-    }
-  };
-  const hasSelected = selectedItems.length > 0;
 
   const handleCustomerData = (customer) => {
     const customerData = customersList.filter((data) => data.name === customer);
@@ -237,7 +163,7 @@ function AddNewOrderForm() {
           setPricedItemsData([]);
           fetchData();
         }, 1000);
-        handleItemsAvailability(newOrderData.items, false);
+        handleItemsAvailability(newOrderData.items, "new order");
         message.success(result.message);
       }
     });
@@ -248,10 +174,11 @@ function AddNewOrderForm() {
   };
 
   useEffect(() => {
-    if (pricedItemsData) {
+    if (pricedItemsData?.length > 0) {
       calculateOrderPrice();
+    } else {
+      setPricedItemsData(null);
     }
-    addKey();
   }, [
     selectedItems,
     pricedItemsData,
@@ -264,7 +191,7 @@ function AddNewOrderForm() {
     <>
       <Form form={form} layout="vertical" onFinish={onFinish} size="large">
         <Card
-          title={<h3>Dados do cliente:</h3>}
+          title={<h3>Novo pedido</h3>}
           extra={<CloseOutlined onClick={() => setAddNewOrderForm(false)} />}
           style={{ backgroundColor: "#dcdcdc" }}
         >
@@ -277,8 +204,9 @@ function AddNewOrderForm() {
             }}
           >
             <Col span={6}>
+              <h2>1 - Dados do cliente</h2>
+              <br />
               <Form.Item
-                label="Selecione o Cliente"
                 name="customerName"
                 rules={[
                   {
@@ -302,25 +230,17 @@ function AddNewOrderForm() {
               </Form.Item>
             </Col>
             <Col span={24}>
-              <h2>
-                Itens do pedido:{" "}
-                {hasSelected
-                  ? `${selectedItems.length} produto(s) selecionado(s)`
-                  : null}
-              </h2>
+              <h2>2 - Selecione os produtos</h2>
               <Divider />
-              <Table
-                columns={itemsColumns}
-                dataSource={stockItems}
-                rowKey={stockItems.id}
-                rowSelection={{
-                  type: "checkbox",
-                  ...rowSelection
-                }}
-              />
+              <OrderItemsTable />
             </Col>
             <Col span={24}>
-              <h2>Frete e Pagamento</h2>
+              <h2>3 - Insira o valor de venda</h2>
+              <Divider />
+              <PricedItemsTable />
+            </Col>
+            <Col span={24}>
+              <h2>4 - Frete e Pagamento</h2>
               <Divider />
             </Col>
             <Col span={4}>
@@ -410,7 +330,6 @@ function AddNewOrderForm() {
                     ref={inputFreightPrice}
                     onChange={(value) => handleFreightPrice(value)}
                     addonBefore="R$"
-                    // formatter={(value) => currencyFormatter(value)}
                     formatter={(value) =>
                       value.replace(/\B(?=(\d{3})+(?!\d))/g, ".")
                     }
@@ -433,124 +352,45 @@ function AddNewOrderForm() {
           </Row>
         </Card>
         <Divider />
-        <Card style={{ backgroundColor: "#ddfccf" }}>
-          <Row>
-            <h2>Resumo do Pedido</h2>
-            <Divider />
-            <Col span={11}>
-              <Space size="small" direction="vertical">
-                <h1>
-                  Pedido <strong>#{newOrderNum}</strong>
-                </h1>
-                <h3>
-                  <strong>Cliente</strong>:{" "}
-                  {selectedCustomer &&
-                    selectedCustomer.map((customer) => (
-                      <span key={customer.id}>
-                        {customer.name} - {customer.phone} - {customer.email}
-                      </span>
-                    ))}{" "}
-                </h3>
-              </Space>
-            </Col>
-            <Col span={2}>
-              <Divider type="vertical" />
-            </Col>
-            <Col span={11}>
-              {deliveryMethod === "Retirada" ? (
-                <>
-                  <h2>{deliveryMethod}</h2>
-                  <h3>Quem retira: {pickupBy}</h3>
-                </>
-              ) : (
-                <>
-                  <h2>{deliveryMethod}</h2>
-                  <h3>
-                    <strong>Endereço:</strong>{" "}
-                    {selectedCustomer &&
-                      selectedCustomer.map((customer) => (
-                        <span key={customer.id}>
-                          {customer.street}, {customer.stNumber} -{" "}
-                          {customer.city} - {customer.state}
-                        </span>
-                      ))}{" "}
-                  </h3>
-                </>
-              )}
-            </Col>
-          </Row>
-          <Row>
-            <Divider />
-            <Col span={24}>
-              <OrderItemsTable
-                items={selectedItems}
-                setPricedItemsData={setPricedItemsData}
-              />
-              <Divider />
-            </Col>
-          </Row>
-          <Row>
-            <Col span={8}>
-              <h2>
-                Total de items: <strong>{selectedItems.length}</strong>
-              </h2>
-              <h2>
-                Valor total dos itens:{" "}
-                <strong>{currencyHelper(totalItemsPrice)}</strong>
-              </h2>
-            </Col>
-            <Col span={8}>
-              <h3>
-                Valor do frete: <strong>{currencyHelper(freigtPrice)}</strong>
-              </h3>
-              <h4>
-                <strong>Observações: </strong>
-                {orderObservations}
-              </h4>
-            </Col>
-            <Col span={8} style={{ backgroundColor: "#bafc9a", padding: 12 }}>
-              <h2>
-                Valor total: <strong>{currencyHelper(totalOrderPrice)}</strong>
-              </h2>
-              <h3>
-                Forma de Pgto:{" "}
-                <strong>
-                  {paymentMethod.method}
-                  {paymentMethod.conditions && (
-                    <> - {paymentMethod.conditions}</>
-                  )}
-                </strong>
-              </h3>
-            </Col>
-            <Divider />
-          </Row>
-          <Row>
-            <Col span={12}>
-              <Space>
-                <Button icon={<SaveOutlined />}>Salvar pedido</Button>
-                <Button icon={<PrinterOutlined />}>Imprimir cotação</Button>
-              </Space>
-            </Col>
-            <Col
-              span={12}
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                alignItems: "center"
-              }}
-            >
-              <Space>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  icon={<CheckSquareOutlined />}
-                >
-                  Gerar pedido
-                </Button>
-              </Space>
-            </Col>
-          </Row>
-        </Card>
+        {React.cloneElement(children, {
+          newOrderNum,
+          selectedCustomer,
+          deliveryMethod,
+          pickupBy,
+          orderObservations,
+          freigtPrice,
+          paymentMethod
+        })}
+        <Row>
+          <Col span={12}>
+            <Space>
+              <Button disabled icon={<SaveOutlined />}>
+                Salvar pedido
+              </Button>
+              <Button disabled icon={<PrinterOutlined />}>
+                Imprimir cotação
+              </Button>
+            </Space>
+          </Col>
+          <Col
+            span={12}
+            style={{
+              display: "flex",
+              justifyContent: "flex-end",
+              alignItems: "center"
+            }}
+          >
+            <Space>
+              <Button
+                type="primary"
+                htmlType="submit"
+                icon={<CheckCircleOutlined />}
+              >
+                Gerar pedido
+              </Button>
+            </Space>
+          </Col>
+        </Row>
       </Form>
     </>
   );

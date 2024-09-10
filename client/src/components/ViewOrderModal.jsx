@@ -56,8 +56,6 @@ function ViewOrderModal() {
       {viewOrderModalContent ? (
         <>
           <Row>
-            <h2>Resumo do Pedido</h2>
-            <Divider />
             <Col span={11}>
               <Space size="small" direction="vertical">
                 <h1>
@@ -71,6 +69,24 @@ function ViewOrderModal() {
                         {customer.name} - {customer.phone} - {customer.email}
                       </span>
                     ))}{" "}
+                </h3>
+                <h3>
+                  <strong>Status do pedido:</strong>{" "}
+                  <span
+                    style={{
+                      padding: "3px 5px",
+                      backgroundColor: `${
+                        viewOrderModalContent[0].status === "Em aberto"
+                          ? "green"
+                          : viewOrderModalContent[0].status === "Faturado"
+                          ? "black"
+                          : "red"
+                      }`,
+                      color: "#fff"
+                    }}
+                  >
+                    {viewOrderModalContent[0].status}{" "}
+                  </span>
                 </h3>
               </Space>
             </Col>
