@@ -228,7 +228,10 @@ function AddNewOrderForm({ children }) {
             <Col span={24}>
               <h2>3 - Insira o valor de venda</h2>
               <Divider />
-              <PricedItemsTable />
+              <PricedItemsTable
+                setTotalItemsPrice={setTotalItemsPrice}
+                setTotalOrderPrice={setTotalOrderPrice}
+              />
               <br />
             </Col>
             <Col span={24}>
@@ -381,6 +384,7 @@ function AddNewOrderForm({ children }) {
                 type="primary"
                 htmlType="submit"
                 icon={<CheckCircleOutlined />}
+                disabled={totalItemsPrice === 0 || totalItemsPrice === null}
               >
                 Gerar pedido
               </Button>

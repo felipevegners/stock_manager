@@ -198,7 +198,6 @@ const OrderItemsTable = () => {
       title: "Preço Custo",
       dataIndex: "totalCosts",
       width: "8%",
-      defaultSortOrder: "descend",
       sorter: (a, b) => a.totalCosts - b.totalCosts,
       render: (text) => {
         return currencyHelper(text);
@@ -210,8 +209,9 @@ const OrderItemsTable = () => {
         return (
           <Button
             icon={<PlusOutlined />}
-            size="medium"
+            size="small"
             type="primary"
+            ghost
             disabled={handleDisableButton(record.id)}
             onClick={() => handleAddSelectedItem(record)}
           >

@@ -17,7 +17,7 @@ import { currencyHelper } from "../helpers/CurrencyHelper";
 import { OrderContext } from "../pages/Orders/OrderContext";
 import { CloseOutlined, EditOutlined, SaveOutlined } from "@ant-design/icons";
 
-const PricedItemsTable = () => {
+const PricedItemsTable = ({ setTotalItemsPrice, setTotalOrderPrice }) => {
   const EditableCell = ({
     editing,
     dataIndex,
@@ -188,13 +188,12 @@ const PricedItemsTable = () => {
       render: (record) => {
         return (
           <Button
-            type="primary"
-            size="medium"
             danger
+            size="small"
             icon={<CloseOutlined />}
             onClick={() => handleRemoveItem(record.id)}
           >
-            Excluir
+            Remover
           </Button>
         );
       }
@@ -224,6 +223,10 @@ const PricedItemsTable = () => {
   };
 
   useEffect(() => {
+    if (selectedItems.length === 0) {
+      setTotalItemsPrice(0);
+      setTotalOrderPrice(0);
+    }
     setData(selectedItems);
   }, [selectedItems]);
 
