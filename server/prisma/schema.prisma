@@ -25,11 +25,11 @@ model Batch {
   updatedAt     DateTime? @updatedAt()
 }
 
-model category {
-  id           String @id @default(auto()) @map("_id") @db.ObjectId
-  itemName     String
-  itemCapacity String
-  itemColor    String
+model Categories {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  type    String
+  name    String @unique
+  content Json
 }
 
 model Item {

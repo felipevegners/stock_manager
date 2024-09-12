@@ -80,10 +80,8 @@ export const updateStockItem = async (data) => {
     capacity,
     battery,
     details,
-    unitPrice,
-    tax,
-    profit,
-    finalPrice,
+    itemCosts,
+    totalCosts,
     status,
     isAvailable
   } = data.body;
@@ -99,10 +97,8 @@ export const updateStockItem = async (data) => {
       capacity,
       battery,
       details,
-      unitPrice,
-      tax,
-      profit,
-      finalPrice,
+      itemCosts,
+      totalCosts,
       status,
       isAvailable
     }

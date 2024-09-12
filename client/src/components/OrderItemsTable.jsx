@@ -1,15 +1,136 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import React, { useContext } from "react";
-import { Button, Table } from "antd";
+import React, { useContext, useRef, useState } from "react";
+import { Button, Input, Space, Table } from "antd";
 import { currencyHelper } from "../helpers/CurrencyHelper";
 import { OrderContext } from "../pages/Orders/OrderContext";
-import { PlusOutlined } from "@ant-design/icons";
+import { PlusOutlined, SearchOutlined } from "@ant-design/icons";
+import Highlighter from "react-highlight-words";
 
 const OrderItemsTable = () => {
   const { itemsAvailable, selectedItems, setSelectedItems } =
     useContext(OrderContext);
+
+  const [searchText, setSearchText] = useState("");
+  const [searchedColumn, setSearchedColumn] = useState("");
+  const searchInput = useRef(null);
+  const handleSearch = (selectedKeys, confirm, dataIndex) => {
+    confirm();
+    setSearchText(selectedKeys[0]);
+    setSearchedColumn(dataIndex);
+  };
+  const handleReset = (clearFilters) => {
+    clearFilters();
+    setSearchText("");
+  };
+
+  const getColumnSearchProps = (dataIndex, name) => ({
+    filterDropdown: ({
+      setSelectedKeys,
+      selectedKeys,
+      confirm,
+      clearFilters,
+      close
+    }) => (
+      <div
+        style={{
+          padding: 8
+        }}
+        onKeyDown={(e) => e.stopPropagation()}
+      >
+        <Input
+          ref={searchInput}
+          placeholder={`Buscar por ${name}`}
+          value={selectedKeys[0]}
+          onChange={(e) =>
+            setSelectedKeys(e.target.value ? [e.target.value] : [])
+          }
+          onPressEnter={() => handleSearch(selectedKeys, confirm, dataIndex)}
+          style={{
+            marginBottom: 8,
+            display: "block"
+          }}
+        />
+        <Space>
+          <Button
+            type="primary"
+            onClick={() => handleSearch(selectedKeys, confirm, dataIndex)}
+            icon={<SearchOutlined />}
+            size="small"
+            style={{
+              width: 90
+            }}
+          >
+            Buscar
+          </Button>
+          <Button
+            onClick={() => {
+              clearFilters;
+              handleReset(clearFilters);
+            }}
+            size="small"
+            style={{
+              width: 90
+            }}
+          >
+            Limpar
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              confirm({
+                closeDropdown: false
+              });
+              setSearchText(selectedKeys[0]);
+              setSearchedColumn(dataIndex);
+            }}
+          >
+            Filtrar
+          </Button>
+          <Button
+            type="link"
+            size="small"
+            onClick={() => {
+              close();
+              handleSearch(selectedKeys, confirm, dataIndex);
+            }}
+          >
+            Fechar
+          </Button>
+        </Space>
+      </div>
+    ),
+    filterIcon: (filtered) => (
+      <SearchOutlined
+        style={{
+          color: filtered ? "#1677ff" : undefined
+        }}
+      />
+    ),
+    onFilter: (value, record) =>
+      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+    onFilterDropdownOpenChange: (visible) => {
+      if (visible) {
+        setTimeout(() => searchInput.current?.select(), 100);
+      }
+    },
+    render: (text) =>
+      searchedColumn === dataIndex ? (
+        <Highlighter
+          highlightStyle={{
+            backgroundColor: "#ffc069",
+            padding: 0
+          }}
+          searchWords={[searchText]}
+          autoEscape
+          textToHighlight={text ? text.toString() : ""}
+        />
+      ) : (
+        text
+      )
+  });
 
   const itemsColumns = [
     {
@@ -21,19 +142,42 @@ const OrderItemsTable = () => {
     },
     {
       title: "IMEI",
-      dataIndex: "imei"
+      dataIndex: "imei",
+      ...getColumnSearchProps("imei", "IMEI")
     },
     {
       title: "Modelo",
-      dataIndex: "model"
+      dataIndex: "model",
+      ...getColumnSearchProps("model", "Modelo")
     },
     {
       title: "Cor",
-      dataIndex: "color"
+      dataIndex: "color",
+      ...getColumnSearchProps("color", "Cor")
     },
     {
       title: "Capacidade",
       dataIndex: "capacity",
+      filters: [
+        {
+          text: "64 GB",
+          value: "64"
+        },
+        {
+          text: "128 GB",
+          value: "128"
+        },
+        {
+          text: "256 GB",
+          value: "256"
+        },
+        {
+          text: "512 GB",
+          value: "512"
+        }
+      ],
+      onFilter: (value, record) => record.capacity.startsWith(value),
+      filterSearch: true,
       render: (text) => {
         return <>{text} GB</>;
       }
@@ -54,6 +198,8 @@ const OrderItemsTable = () => {
       title: "Preço Custo",
       dataIndex: "totalCosts",
       width: "8%",
+      defaultSortOrder: "descend",
+      sorter: (a, b) => a.totalCosts - b.totalCosts,
       render: (text) => {
         return currencyHelper(text);
       }

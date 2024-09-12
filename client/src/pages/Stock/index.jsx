@@ -1,80 +1,24 @@
 import { useEffect, useState } from "react";
-import {
-  Input,
-  Select,
-  Space,
-  Divider,
-  Alert,
-  Button,
-  Spin,
-  message
-} from "antd";
+import { Space, Divider, Button, Spin, message } from "antd";
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 import { getItems } from "../../controllers/ItemController";
-import { getBatches } from "../../controllers/BatchController";
-import Link from "antd/es/typography/Link";
 import ItemsTable from "../../components/ItemsTable";
 import { ItemContext } from "./ItemContext";
 import { useNavigate } from "react-router-dom";
-
-const { Option } = Select;
-const { Search } = Input;
+import { getCategories } from "../../controllers/CategoriesController";
 
 function Stock() {
   const [stock, setStock] = useState([]);
-
-  const [searchFor, setSearchFor] = useState("");
-  const [searchTerm, setSearchTerm] = useState("");
-  const [searchMode, setSearchMode] = useState(false);
-  const [showSearchAlert, setShowSearchAlert] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [modelsCat, setmodelsCat] = useState([]);
+  const [colorsCat, setColorsCat] = useState([]);
+  const [capacityCat, setCapacityCat] = useState([]);
 
   const navigate = useNavigate();
 
   const handleViewAddNew = () => {
     navigate("/stock/add");
   };
-
-  const handleSearch = (value, _e, info) => {
-    const searchParams = { [searchFor]: value };
-
-    if (info?.source === "input" && value !== "") {
-      getItems(searchParams).then((result) => setStock(result));
-      setSearchTerm(value);
-      setSearchMode(true);
-    } else if (info?.source === "input" && value === "") {
-      setShowSearchAlert(true);
-    } else {
-      setSearchMode(false);
-      getItems().then((result) => setStock(result));
-    }
-  };
-
-  const translateSearchFor = (term) => {
-    if (term === "imei") return "IMEI";
-    if (term === "model") return "Modelo";
-    if (term === "color") return "Cor";
-    if (term === "capacity") return "Capacidade";
-    if (term === "battery") return "Bateria";
-
-    return term;
-  };
-
-  const selectOptions = (
-    <Select
-      placeholder="Buscar por"
-      style={{ width: 150 }}
-      onSelect={(value) => {
-        setSearchFor(value);
-      }}
-    >
-      <Option value="imei">IMEI</Option>
-      <Option value="model">Modelo</Option>
-      <Option value="color">Cor</Option>
-      <Option value="capacity">Capacidade</Option>
-      <Option value="battery">Bateria</Option>
-    </Select>
-  );
 
   const fetchData = async () => {
     await getItems().then((result) => {
@@ -87,6 +31,14 @@ function Stock() {
         }, 1000);
       }
     });
+    await getCategories().then((result) => {
+      const models = result.filter((cat) => cat.name === "Modelos");
+      setmodelsCat(models[0].content);
+      const colors = result.filter((cat) => cat.name === "Cores");
+      setColorsCat(colors[0].content);
+      const capacity = result.filter((cat) => cat.name === "Capacidade");
+      setCapacityCat(capacity[0].content);
+    });
   };
 
   useEffect(() => {
@@ -94,7 +46,9 @@ function Stock() {
   }, []);
 
   return (
-    <ItemContext.Provider value={{ fetchData }}>
+    <ItemContext.Provider
+      value={{ fetchData, stock, modelsCat, colorsCat, capacityCat }}
+    >
       <Space direction="horizontal" size="large" style={{ width: "100%" }}>
         <h1>Estoque Ativo</h1>
         <Button
@@ -105,41 +59,9 @@ function Stock() {
         >
           Adicionar produto
         </Button>
+        <h4>Total de itens em estoque: {stock.length}</h4>
       </Space>
       <Divider />
-      <Space direction="vertical" size={"large"} style={{ width: "100%" }}>
-        <h3>Buscar produto por característica:</h3>
-        <Search
-          placeholder="Digite sua busca"
-          size="large"
-          onSearch={handleSearch}
-          addonBefore={selectOptions}
-          enterButton="Buscar"
-          allowClear
-        />
-        {showSearchAlert && (
-          <Alert
-            message="Digite uma busca válida"
-            type="warning"
-            showIcon
-            closable
-            onClose={() => setShowSearchAlert(false)}
-          />
-        )}
-      </Space>
-      <Divider />
-      {searchMode && (
-        <Space style={{ marginBottom: 24 }}>
-          <h2>
-            Mostrando {stock.length} resultado{stock.length > 1 ? "s" : ""} da
-            busca por:{" "}
-            <strong>&quot;{translateSearchFor(searchFor)}&quot;</strong> e{" "}
-            <strong>&quot;{searchTerm}&quot;</strong>
-          </h2>
-          <Divider type="vertical" />
-          <Link onClick={handleSearch}>Limpar resultados</Link>
-        </Space>
-      )}
       {isLoading ? (
         <Spin
           spinning={isLoading}
@@ -147,7 +69,7 @@ function Stock() {
           size="large"
         />
       ) : (
-        <ItemsTable tableData={stock} fetchData={fetchData} />
+        <ItemsTable />
       )}
     </ItemContext.Provider>
   );

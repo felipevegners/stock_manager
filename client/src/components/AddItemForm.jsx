@@ -20,12 +20,16 @@ import { getBatches } from "../controllers/BatchController";
 import { QuestionCircleFilled } from "@ant-design/icons";
 import { currencyHelper } from "../helpers/CurrencyHelper";
 import TextArea from "antd/es/input/TextArea";
+import { getCategories } from "../controllers/CategoriesController";
 
 // eslint-disable-next-line react/prop-types
 function AddItemForm() {
   const [batches, setBatches] = useState([]);
   const [selectedBatch, setSelectedBatch] = useState([]);
   const [showBatchData, setShowBatchData] = useState(false);
+  const [modelsCat, setmodelsCat] = useState([]);
+  const [colorsCat, setColorsCat] = useState([]);
+  const [capacityCat, setCapacityCat] = useState([]);
 
   const navigate = useNavigate();
   const [form] = Form.useForm();
@@ -79,6 +83,15 @@ function AddItemForm() {
         setBatches(result);
       }
     });
+
+    await getCategories().then((result) => {
+      const models = result.filter((cat) => cat.name === "Modelos");
+      setmodelsCat(models[0].content);
+      const colors = result.filter((cat) => cat.name === "Cores");
+      setColorsCat(colors[0].content);
+      const capacity = result.filter((cat) => cat.name === "Capacidade");
+      setCapacityCat(capacity[0].content);
+    });
   };
 
   const handleSelectedBatch = (value) => {
@@ -94,7 +107,7 @@ function AddItemForm() {
     return (
       <>
         <h3>
-          <strong>{selectedBatch[0]?.batchName}</strong>
+          <strong>Lote: {selectedBatch[0]?.batchName}</strong>
         </h3>
         <hr />
         <br />
@@ -225,7 +238,21 @@ function AddItemForm() {
                   }
                 ]}
               >
-                <Input />
+                <Select style={{ width: 248 }}>
+                  {modelsCat &&
+                    modelsCat.map((model, index) => (
+                      <Select.Option key={index} value={model}>
+                        {model}
+                      </Select.Option>
+                    ))}
+                  <Select.Option>
+                    <Typography.Link
+                      onClick={() => navigate("/stock/categories")}
+                    >
+                      Adicionar Modelo
+                    </Typography.Link>
+                  </Select.Option>
+                </Select>
               </Form.Item>
               <Form.Item
                 label="Cor"
@@ -237,7 +264,21 @@ function AddItemForm() {
                   }
                 ]}
               >
-                <Input />
+                <Select style={{ width: 248 }}>
+                  {colorsCat &&
+                    colorsCat.map((color, index) => (
+                      <Select.Option key={index} value={color}>
+                        {color}
+                      </Select.Option>
+                    ))}
+                  <Select.Option>
+                    <Typography.Link
+                      onClick={() => navigate("/stock/categories")}
+                    >
+                      Adicionar Cor
+                    </Typography.Link>
+                  </Select.Option>
+                </Select>
               </Form.Item>
               <Form.Item
                 label="Capacidade"
@@ -249,7 +290,21 @@ function AddItemForm() {
                   }
                 ]}
               >
-                <Input type="number" />
+                <Select style={{ width: 248 }}>
+                  {capacityCat &&
+                    capacityCat.map((capacity, index) => (
+                      <Select.Option key={index} value={capacity}>
+                        {capacity}
+                      </Select.Option>
+                    ))}
+                  <Select.Option>
+                    <Typography.Link
+                      onClick={() => navigate("/stock/categories")}
+                    >
+                      Adicionar Capacidade
+                    </Typography.Link>
+                  </Select.Option>
+                </Select>
               </Form.Item>
               <Form.Item
                 label="Bateria"

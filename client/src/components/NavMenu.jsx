@@ -50,12 +50,8 @@ const navigation = [
         label: "Categorias",
         children: [
           {
-            label: "Listar Categorias",
-            key: "/stock/category/list"
-          },
-          {
-            label: "Adicionar categoria ",
-            key: "/stock/category/add"
+            label: "Editar Categorias",
+            key: "/stock/categories"
           }
         ]
       }
