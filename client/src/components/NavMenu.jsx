@@ -70,7 +70,8 @@ const navigation = [
   {
     label: "Relatórios",
     icon: <FundOutlined />,
-    key: "/reports"
+    key: "/reports",
+    disabled: true
   }
 ];
 

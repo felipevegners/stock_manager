@@ -1,3 +1,14 @@
 .header-solid {
   margin: 0;
 }
+
+.dash-card {
+  min-width: 450px;
+  text-align: center;
+}
+
+.dash-blocks {
+  padding: 8px;
+  border: 1px solid black;
+  border-radius: 6px;
+}

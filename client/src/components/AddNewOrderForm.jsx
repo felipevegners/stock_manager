@@ -51,6 +51,7 @@ function AddNewOrderForm({ children }) {
   const [pickupBy, setPickupBy] = useState("");
   const [totalItemsPrice, setTotalItemsPrice] = useState(null);
   const [totalOrderPrice, setTotalOrderPrice] = useState(null);
+  const [orderProfit, setOrderProfit] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState({});
   const [orderStatus, setOrderStatus] = useState(null);
   const [orderObservations, setOrderObservations] = useState("");
@@ -125,6 +126,13 @@ function AddNewOrderForm({ children }) {
 
       setTotalItemsPrice(totalItemsPrice);
       setTotalOrderPrice(totalOrder);
+
+      const totalItemsCosts = selectedItems?.reduce((acc, obj) => {
+        return acc + obj.totalCosts;
+      }, 0);
+
+      const totalOrderProfit = totalItemsPrice - totalItemsCosts;
+      setOrderProfit(totalOrderProfit.toFixed(2));
     } else {
       setTotalItemsPrice(0);
       setTotalOrderPrice(0);
@@ -173,6 +181,7 @@ function AddNewOrderForm({ children }) {
   };
 
   useEffect(() => {
+    console.log("Lucro total -> ", orderProfit);
     if (selectedItems?.length > 0) {
       calculateOrderPrice();
     }
@@ -210,6 +219,7 @@ function AddNewOrderForm({ children }) {
                   ref={inputCustomerName}
                   onSelect={(value) => handleCustomerData(value)}
                   placeholder="Selecione o cliente"
+                  allowClear
                 >
                   {customersList &&
                     customersList.map((customer) => (
@@ -252,6 +262,7 @@ function AddNewOrderForm({ children }) {
                 <Select
                   placeholder="Forma de pagamento"
                   onSelect={(value) => handlePaymentForm(value)}
+                  allowClear
                 >
                   <Option value="pago">À vista</Option>
                   <Option value="a pagar">À pagar</Option>
@@ -274,6 +285,7 @@ function AddNewOrderForm({ children }) {
                   <Input
                     ref={inputPaymentConditions}
                     onChange={handlePaymentConditions}
+                    allowClear
                   />
                 </Form.Item>
               </Col>
@@ -292,6 +304,7 @@ function AddNewOrderForm({ children }) {
                 <Select
                   placeholder="Selecione"
                   onSelect={(value) => handleDeliveryMethod(value)}
+                  allowClear
                 >
                   <Option value="motoboy">Entrega motoboy</Option>
                   <Option value="pickup">Retirada</Option>
@@ -308,7 +321,11 @@ function AddNewOrderForm({ children }) {
                     { required: true, message: "Insira o nome do responsável" }
                   ]}
                 >
-                  <Input ref={inputPickupBy} onChange={handlePickupBy} />
+                  <Input
+                    ref={inputPickupBy}
+                    onChange={handlePickupBy}
+                    allowClear
+                  />
                 </Form.Item>
               </Col>
             )}
@@ -325,10 +342,6 @@ function AddNewOrderForm({ children }) {
                     ref={inputFreightPrice}
                     onChange={(value) => handleFreightPrice(value)}
                     addonBefore="R$"
-                    formatter={(value) =>
-                      value.replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-                    }
-                    parser={(value) => value?.replace(/\s?|(.*)/g, "")}
                   />
                 </Form.Item>
               </Col>
@@ -341,6 +354,7 @@ function AddNewOrderForm({ children }) {
                   ref={inputObservations}
                   rows={2}
                   onChange={handleOrderObservations}
+                  allowClear
                 />
               </Form.Item>
             </Col>
