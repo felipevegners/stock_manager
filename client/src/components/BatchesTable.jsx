@@ -14,6 +14,7 @@ import { useContext, useEffect, useState } from "react";
 
 import { currencyHelper } from "../helpers/CurrencyHelper";
 import { QuestionCircleOutlined } from "@ant-design/icons";
+import MaskedInput from "./MaskedInput";
 
 const EditableCell = ({
   editing,
@@ -25,7 +26,14 @@ const EditableCell = ({
   children,
   ...restProps
 }) => {
-  const inputNode = inputType === "number" ? <InputNumber /> : <Input />;
+  const inputNode =
+    inputType === "money" ? (
+      <MaskedInput customInput={Input} type="numeric" prefix="R$" width={140} />
+    ) : inputType === "number" ? (
+      <InputNumber />
+    ) : (
+      <Input />
+    );
   return (
     <td {...restProps}>
       {editing ? (
@@ -51,7 +59,7 @@ const EditableCell = ({
 };
 
 function BatchesTable({ batches }) {
-  const { isLoading, upDateBatchData } = useContext(BatchContext);
+  const { isLoading, upDateBatchData, removeBatch } = useContext(BatchContext);
 
   const [form] = Form.useForm();
   const [data, setData] = useState(batches);
@@ -127,12 +135,18 @@ function BatchesTable({ batches }) {
     {
       title: "Frete",
       dataIndex: "batchFreight",
-      editable: true
+      editable: true,
+      render: (text) => {
+        return currencyHelper(text);
+      }
     },
     {
       title: "Motoboy",
       dataIndex: "batchBoyPrice",
-      editable: true
+      editable: true,
+      render: (text) => {
+        return currencyHelper(text);
+      }
     },
     {
       title: "Ações",
@@ -171,12 +185,22 @@ function BatchesTable({ batches }) {
             </Popconfirm>
           </span>
         ) : (
-          <Typography.Link
-            disabled={editingKey !== ""}
-            onClick={() => edit(record)}
-          >
-            Editar
-          </Typography.Link>
+          <>
+            <Typography.Link
+              disabled={editingKey !== ""}
+              onClick={() => edit(record)}
+            >
+              Editar
+            </Typography.Link>
+            <Divider type="vertical" />
+            <Typography.Link
+              disabled={true}
+              onClick={() => removeBatch(record.id)}
+              style={{ color: "red", opacity: 0.5 }}
+            >
+              Excluir
+            </Typography.Link>
+          </>
         );
       }
     }
@@ -198,11 +222,11 @@ function BatchesTable({ batches }) {
           col.dataIndex === "batchQty"
             ? "number"
             : col.dataIndex === "batchTax"
-            ? "number"
+            ? "money"
             : col.dataIndex === "batchFreight"
-            ? "number"
+            ? "money"
             : col.dataIndex === "batchBoyPrice"
-            ? "number"
+            ? "money"
             : "text",
         dataIndex: col.dataIndex,
         title: col.title,

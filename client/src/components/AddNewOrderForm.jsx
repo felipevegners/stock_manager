@@ -28,6 +28,7 @@ import {
 
 import PricedItemsTable from "./PricedItemsTable";
 import OrderItemsTable from "./OrderItemsTable";
+import MaskedInput from "./MaskedInput";
 
 const { Option } = Select;
 
@@ -181,7 +182,6 @@ function AddNewOrderForm({ children }) {
   };
 
   useEffect(() => {
-    console.log("Lucro total -> ", orderProfit);
     if (selectedItems?.length > 0) {
       calculateOrderPrice();
     }
@@ -338,10 +338,12 @@ function AddNewOrderForm({ children }) {
                     { required: true, message: "Insira o valor do frete" }
                   ]}
                 >
-                  <InputNumber
-                    ref={inputFreightPrice}
+                  <MaskedInput
+                    refInput={inputFreightPrice}
                     onChange={(value) => handleFreightPrice(value)}
-                    addonBefore="R$"
+                    customInput={Input}
+                    type="numeric"
+                    prefix="R$"
                   />
                 </Form.Item>
               </Col>

@@ -21,6 +21,7 @@ import { QuestionCircleFilled } from "@ant-design/icons";
 import { currencyHelper } from "../helpers/CurrencyHelper";
 import TextArea from "antd/es/input/TextArea";
 import { getCategories } from "../controllers/CategoriesController";
+import MaskedInput from "./MaskedInput";
 
 // eslint-disable-next-line react/prop-types
 function AddItemForm() {
@@ -321,7 +322,7 @@ function AddItemForm() {
             </Col>
             <Col span={10} offset={2}>
               <Form.Item
-                label="Custo USD"
+                label="Custo em Dólares"
                 name="itemCosts"
                 rules={[
                   {
@@ -337,8 +338,14 @@ function AddItemForm() {
                   onChange={(value) => calculateFinalCosts(value)}
                 />
               </Form.Item>
-              <Form.Item label="Custo Final" name="totalCosts">
-                <InputNumber step="0.01" addonBefore="R$" readOnly />
+              <Form.Item label="Custo Final (Cálculo)" name="totalCosts">
+                <MaskedInput
+                  type="numeric"
+                  customInput={Input}
+                  readOnly={true}
+                  prefix="R$"
+                />
+                {/* <InputNumber step="0.01" addonBefore="R$" readOnly /> */}
               </Form.Item>
 
               <Form.Item

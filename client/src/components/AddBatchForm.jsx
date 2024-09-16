@@ -2,6 +2,7 @@
 import { useContext, useState } from "react";
 import { Button, Col, Form, Input, InputNumber, Row, DatePicker } from "antd";
 import { BatchContext } from "../pages/Batch/BatchContext";
+import MaskedInput from "./MaskedInput";
 
 function AddBatchForm() {
   const { createNewBatch, fetchData } = useContext(BatchContext);
@@ -82,7 +83,7 @@ function AddBatchForm() {
               <InputNumber />
             </Form.Item>
             <Form.Item
-              label="Taxa U$D"
+              label="Taxa Dólar"
               name="batchTax"
               rules={[
                 {
@@ -91,7 +92,7 @@ function AddBatchForm() {
                 }
               ]}
             >
-              <InputNumber addonBefore="U$D" />
+              <MaskedInput customInput={Input} type="numeric" prefix="R$" />
             </Form.Item>
             <Form.Item
               label="Frete"
@@ -103,7 +104,7 @@ function AddBatchForm() {
                 }
               ]}
             >
-              <InputNumber addonBefore="R$" />
+              <MaskedInput customInput={Input} type="numeric" prefix="R$" />
             </Form.Item>
             <Form.Item
               label="Custos Motoboy"
@@ -115,7 +116,7 @@ function AddBatchForm() {
                 }
               ]}
             >
-              <InputNumber addonBefore="R$" />
+              <MaskedInput customInput={Input} type="numeric" prefix="R$" />
             </Form.Item>
             <Button type="primary" htmlType="submit" size="large">
               Salvar Lote

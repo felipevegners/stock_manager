@@ -7,7 +7,6 @@ import {
   Form,
   Input,
   InputNumber,
-  Popconfirm,
   Space,
   Table,
   Tooltip,
@@ -16,8 +15,16 @@ import {
 import { currencyHelper } from "../helpers/CurrencyHelper";
 import { OrderContext } from "../pages/Orders/OrderContext";
 import { CloseOutlined, EditOutlined, SaveOutlined } from "@ant-design/icons";
+import MaskedInput from "./MaskedInput";
 
 const PricedItemsTable = ({ setTotalItemsPrice, setTotalOrderPrice }) => {
+  const { selectedItems, setSelectedItems } = useContext(OrderContext);
+
+  const [form] = Form.useForm();
+  const [data, setData] = useState(selectedItems);
+  const [editingKey, setEditingKey] = useState("");
+  const isEditing = (record) => record.id === editingKey;
+
   const EditableCell = ({
     editing,
     dataIndex,
@@ -30,12 +37,11 @@ const PricedItemsTable = ({ setTotalItemsPrice, setTotalOrderPrice }) => {
   }) => {
     const inputNode =
       inputType === "number" ? (
-        <InputNumber
-          controls={false}
-          onBlur={() => save(record.id)}
-          onPressEnter={() => save(record.id)}
-          style={{ width: 180 }}
-          addonBefore="R$"
+        <MaskedInput
+          customInput={Input}
+          type="numeric"
+          prefix="R$"
+          width={180}
         />
       ) : (
         <Input />
@@ -77,12 +83,6 @@ const PricedItemsTable = ({ setTotalItemsPrice, setTotalOrderPrice }) => {
     );
   };
 
-  const { selectedItems, setSelectedItems } = useContext(OrderContext);
-
-  const [form] = Form.useForm();
-  const [data, setData] = useState(selectedItems);
-  const [editingKey, setEditingKey] = useState("");
-  const isEditing = (record) => record.id === editingKey;
   const edit = (record) => {
     form.setFieldsValue({
       sellPrice: 0,

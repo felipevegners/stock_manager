@@ -5,6 +5,7 @@ import BatchesTable from "../../components/BatchesTable";
 
 import {
   createBatch,
+  deleteBatch,
   getBatches,
   updateBatch
 } from "../../controllers/BatchController";
@@ -50,12 +51,32 @@ function Batches() {
     });
   };
 
+  const removeBatch = (batchId) => {
+    deleteBatch(batchId).then((result) => {
+      if (result?.response?.status === 400)
+        message.error("Lote não exluído. Tente novamente.");
+      else {
+        message.success(result.message);
+        setTimeout(() => {
+          fetchData();
+        }, 1000);
+      }
+    });
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
   return (
     <BatchContext.Provider
-      value={{ batches, isLoading, fetchData, createNewBatch, upDateBatchData }}
+      value={{
+        batches,
+        isLoading,
+        fetchData,
+        createNewBatch,
+        upDateBatchData,
+        removeBatch
+      }}
     >
       <Space direction="vertical" size="large" style={{ width: "100%" }}>
         <h1>Gerenciar Lotes </h1>

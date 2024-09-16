@@ -315,6 +315,7 @@ const ItemsTable = () => {
       editable: false,
       width: 100,
       fixed: "left",
+      sorter: (a, b) => a.batch.name.length - b.batch.name.length,
       render: (text) => {
         return <>{text?.name}</>;
       }
@@ -404,7 +405,7 @@ const ItemsTable = () => {
       dataIndex: "status",
       editable: true,
       width: "8%",
-      sorter: (a, b) => a.status - b.status,
+      sorter: (a, b) => a.status.length - b.status.length,
       render: (text) => {
         return (
           <Badge

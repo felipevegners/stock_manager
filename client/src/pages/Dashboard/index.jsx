@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Card, Space, Flex, message, Divider, List } from "antd";
+import { Card, Flex, message, Divider, List } from "antd";
 import { FileDoneOutlined, ProductOutlined } from "@ant-design/icons";
 import { getItems } from "../../controllers/ItemController";
 import { getOrders } from "../../controllers/OrderController";
