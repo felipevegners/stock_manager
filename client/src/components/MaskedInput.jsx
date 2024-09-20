@@ -35,7 +35,6 @@ function MaskedInput({
       allowClear
       defaultValue={"0,00"}
       readOnly={readOnly}
-      disabled
     />
   ) : (
     <PatternFormat
