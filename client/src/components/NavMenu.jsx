@@ -6,8 +6,10 @@ import {
   FileDoneOutlined,
   FundOutlined,
   ProductOutlined,
+  SettingOutlined,
   UserOutlined
 } from "@ant-design/icons";
+// import AuthContext from "../context/AuthContext";
 
 const navigation = [
   {
@@ -72,6 +74,11 @@ const navigation = [
     icon: <FundOutlined />,
     key: "/reports",
     disabled: true
+  },
+  {
+    label: "Usuários",
+    icon: <SettingOutlined />,
+    key: "/users"
   }
 ];
 
@@ -92,7 +99,6 @@ function NavMenu() {
       defaultSelectedKeys={[key]}
       selectedKeys={[key]}
       onClick={handleMenuClick}
-      selectable={true}
     />
   );
 }

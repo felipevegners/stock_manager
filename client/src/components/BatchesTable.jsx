@@ -194,9 +194,8 @@ function BatchesTable({ batches }) {
             </Typography.Link>
             <Divider type="vertical" />
             <Typography.Link
-              disabled={true}
               onClick={() => removeBatch(record.id)}
-              style={{ color: "red", opacity: 0.5 }}
+              style={{ color: "red" }}
             >
               Excluir
             </Typography.Link>
