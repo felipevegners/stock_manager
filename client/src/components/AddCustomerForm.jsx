@@ -5,11 +5,14 @@ import {
   Button,
   Col,
   Divider,
+  Flex,
   Form,
   Input,
   InputNumber,
   message,
-  Row
+  Radio,
+  Row,
+  Space
 } from "antd";
 import {
   createCustomer,
@@ -25,7 +28,7 @@ function AddCustomerForm({
   customerDataToEdit,
   handleCancel
 }) {
-  const [document, setDocument] = useState("");
+  const [documentType, setDocumentType] = useState("");
 
   const inputName = useRef();
   const inputDocument = useRef();
@@ -44,7 +47,7 @@ function AddCustomerForm({
   const handleCustomerData = () => {
     const newCustomerData = {
       name: inputName.current.input.value,
-      document: inputDocument.current.input.value,
+      document: inputDocument.current.value,
       phone: inputPhone.current.input.value,
       email: inputEmail.current.input.value,
       street: inputStreet.current.input.value,
@@ -87,7 +90,9 @@ function AddCustomerForm({
   };
 
   const handleDocument = (event) => {
-    setDocument(event.unmaskedValue);
+    form.setFieldsValue({ document: "" });
+    const { value } = event.target;
+    setDocumentType(value);
   };
 
   const updateFormValues = () => {
@@ -135,34 +140,56 @@ function AddCustomerForm({
             >
               <Input ref={inputName} />
             </Form.Item>
-            <Form.Item
-              label="CPF ou CNPJ"
-              name="document"
-              width={"auto"}
-              rules={[
-                {
-                  required: true,
-                  message: "Insira um documento válido"
-                }
-              ]}
-            >
-              {/* <MaskedInput
-                ref={inputDocument}
-                mask={
-                  document.length < 15 ? "000.000.000-00" : "00.000.000/0001-00"
-                }
-                value={document}
-                onChange={(event) => handleDocument(event)}
-                className="ant-input ant-input-lg css-dev-only-do-not-override-d2lrxs ant-input-outlined ant-input-status-success"
-              /> */}
-              <InputNumber
-                ref={inputDocument}
-                formatter={(value) =>
-                  value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/g, "$1.$2.$3-$4")
-                }
-                maxLength={11}
-              />
-            </Form.Item>
+            <Space direction="vertical">
+              <Flex vertical gap="middle">
+                <Radio.Group
+                  onChange={handleDocument}
+                  value={documentType}
+                  size="small"
+                >
+                  <Radio.Button value={"cpf"}>CPF</Radio.Button>
+                  <Radio.Button value={"cnpj"}>CNPJ</Radio.Button>
+                </Radio.Group>
+              </Flex>
+              <Form.Item
+                label="Documento"
+                name="document"
+                rules={[
+                  {
+                    required: true,
+                    message: "Insira um documento válido"
+                  }
+                ]}
+              >
+                {documentType === "cpf" ? (
+                  <InputNumber
+                    ref={inputDocument}
+                    formatter={(value) =>
+                      value.replace(
+                        /(\d{3})(\d{3})(\d{3})(\d{2})/g,
+                        "$1.$2.$3-$4"
+                      )
+                    }
+                    style={{ width: 180 }}
+                    maxLength={14}
+                    controls={false}
+                  />
+                ) : (
+                  <InputNumber
+                    ref={inputDocument}
+                    formatter={(value) =>
+                      value.replace(
+                        /(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/g,
+                        "$1.$2.$3/$4-$5"
+                      )
+                    }
+                    style={{ width: 180 }}
+                    maxLength={18}
+                    controls={false}
+                  />
+                )}
+              </Form.Item>
+            </Space>
             <Form.Item
               label="Telefone"
               name="phone"

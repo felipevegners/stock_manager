@@ -29,6 +29,7 @@ import {
 import PricedItemsTable from "./PricedItemsTable";
 import OrderItemsTable from "./OrderItemsTable";
 import MaskedInput from "./MaskedInput";
+import { useReactToPrint } from "react-to-print";
 
 const { Option } = Select;
 
@@ -180,6 +181,13 @@ function AddNewOrderForm({ children }) {
   const onFinish = (values) => {
     addNewOrder(values);
   };
+  // Print Order Function and Config
+  const componentRef = useRef(null);
+  const printFn = useReactToPrint({
+    contentRef: componentRef,
+    documentTitle: `Pedido ${newOrderNum} - ${selectedCustomer[0].name}`,
+    suppressErrors: true
+  });
 
   useEffect(() => {
     if (selectedItems?.length > 0) {
@@ -363,26 +371,33 @@ function AddNewOrderForm({ children }) {
           </Row>
         </Card>
         <Divider />
-        {React.cloneElement(children, {
-          newOrderNum,
-          selectedCustomer,
-          deliveryMethod,
-          pickupBy,
-          orderObservations,
-          freigtPrice,
-          paymentMethod,
-          selectedItems,
-          totalItemsPrice,
-          totalOrderPrice
-        })}
+        <div ref={componentRef}>
+          {React.cloneElement(children, {
+            newOrderNum,
+            selectedCustomer,
+            deliveryMethod,
+            pickupBy,
+            orderObservations,
+            freigtPrice,
+            paymentMethod,
+            selectedItems,
+            totalItemsPrice,
+            totalOrderPrice
+          })}
+        </div>
         <Divider />
         <Row>
           <Col span={12}>
             <Space>
-              <Button disabled icon={<SaveOutlined />}>
+              {/* <Button disabled icon={<SaveOutlined />}>
                 Salvar pedido
-              </Button>
-              <Button disabled icon={<PrinterOutlined />}>
+              </Button> */}
+
+              <Button
+                onClick={printFn}
+                icon={<PrinterOutlined />}
+                disabled={totalItemsPrice === 0 || totalItemsPrice === null}
+              >
                 Imprimir cotação
               </Button>
             </Space>
