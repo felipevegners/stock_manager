@@ -185,7 +185,7 @@ function AddNewOrderForm({ children }) {
   const componentRef = useRef(null);
   const printFn = useReactToPrint({
     contentRef: componentRef,
-    documentTitle: `Pedido ${newOrderNum} - ${selectedCustomer[0].name}`,
+    documentTitle: `Pedido ${newOrderNum} - ${selectedCustomer[0]?.name}`,
     suppressErrors: true
   });
 
