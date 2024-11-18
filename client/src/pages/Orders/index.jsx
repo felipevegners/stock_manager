@@ -47,6 +47,7 @@ function Orders() {
   // For auth implementation:
   const [showOrderDelete, setShowOrderDelete] = useState(true);
   const [editPopOverOpen, setEditPopOverOpen] = useState(false);
+  const [editingOrderId, setEditOrderId] = useState("");
   const [confirmEditOrder, setConfirmEditOrder] = useState(false);
   const [editOrderAction, setEditOrderAction] = useState({
     action: "",
@@ -133,7 +134,7 @@ function Orders() {
                   content={editOrderContent}
                   title="Editar pedido"
                   trigger="click"
-                  open={editPopOverOpen}
+                  open={editingOrderId === record.id ? true : false}
                 >
                   <Typography.Link onClick={() => showEditPopOver(record)}>
                     Editar
@@ -300,6 +301,7 @@ function Orders() {
   };
 
   const showEditPopOver = (orderData) => {
+    setEditOrderId(orderData.id);
     setEditPopOverOpen(true);
     editOrderAction.id = orderData.id;
     editOrderAction.items = orderData.items;
@@ -340,7 +342,7 @@ function Orders() {
         >
           Confirmar
         </Button>
-        <Typography.Link onClick={() => setEditPopOverOpen(false)}>
+        <Typography.Link onClick={() => setEditOrderId("")}>
           Fechar
         </Typography.Link>
       </Space>

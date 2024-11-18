@@ -3,13 +3,7 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { CloseOutlined, PlusOutlined } from "@ant-design/icons";
 import { Flex, Input, message, Tag, theme, Tooltip } from "antd";
 import { CategoriesContext } from "../pages/Categories/CategoriesContext";
-const tagInputStyle = {
-  width: 84,
-  fontSize: 16,
-  padding: "6px 10px",
-  marginInlineEnd: 8,
-  verticalAlign: "top"
-};
+
 const CategoriesTags = ({ tagsData }) => {
   const { updateCategories } = useContext(CategoriesContext);
 
@@ -29,7 +23,6 @@ const CategoriesTags = ({ tagsData }) => {
         message.error("Erro ao atualizar dados da categoria. Tente novamente.");
       } else {
         message.success(result.message);
-        // setTimeout(() => {}, 1000);
       }
     });
   };
@@ -70,7 +63,6 @@ const CategoriesTags = ({ tagsData }) => {
     const newTags = [...tags];
     newTags[editInputIndex] = editInputValue;
     setTags(newTags);
-    console.log("Handle Edit Input Confirm -> ", newTags);
     setEditInputIndex(-1);
     setEditInputValue("");
   };
@@ -78,6 +70,13 @@ const CategoriesTags = ({ tagsData }) => {
     padding: "6px 10px",
     background: token.colorBgContainer,
     borderStyle: "dashed"
+  };
+  const tagInputStyle = {
+    width: 84,
+    fontSize: 16,
+    padding: "3px 10px",
+    marginInlineEnd: 8,
+    verticalAlign: "top"
   };
   return (
     <Flex gap="4px 0" wrap>
@@ -103,11 +102,13 @@ const CategoriesTags = ({ tagsData }) => {
             closable={true}
             style={{
               userSelect: "none",
-              backgroundColor: "#ccc",
-              borderColor: "#001529",
-              padding: "6px 10px"
+              backgroundColor: "#1677FF",
+              color: "#FFFFFF",
+              padding: "6px 10px",
+              display: "flex",
+              alignItems: "center"
             }}
-            closeIcon={<CloseOutlined style={{ color: "#001529" }} />}
+            closeIcon={<CloseOutlined style={{ color: "#FFFFFF" }} />}
             onClose={() => handleClose(tag)}
           >
             <span

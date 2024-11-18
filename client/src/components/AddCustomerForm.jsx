@@ -76,7 +76,6 @@ function AddCustomerForm({
     } else {
       createCustomer(newCustomerData).then((result) => {
         if (result?.response?.status === 400) {
-          console.log(result);
           message.error(
             "Cliente não cadastrado. Verifique os dados inseridos."
           );
